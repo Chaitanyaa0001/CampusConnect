@@ -1,0 +1,38 @@
+
+services:
+  auth-service:
+    build: ./services/auth-service
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./services/auth-service/.env
+    environment:
+      NODE_ENV: production
+    depends_on:
+      - rabbit-mq
+      - postgres
+      - redis
+    secrets:
+      - private_key
+      - public_key
+    restart: unless-stopped
+
+  # user-service:
+  #   build: ./services/user-service
+  #   ports:
+  #     - "3001:3000"
+  #   env_file:
+  #     - ./services/user-service/.env
+  #   environment:
+  #     NODE_ENV: production
+  #   command: pnpm start
+  #   depends_on:
+  #     - rabbit-mq
+  #     - postgres
+  #   restart: unless-stopped
+
+secrets:
+  private_key:
+    external: true
+  public_key:
+    external: true
