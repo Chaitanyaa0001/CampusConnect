@@ -1,4 +1,6 @@
-import prisma from "../config/prisma";
+
+
+import { prisma } from "../config/prisma";
 import { AppError } from "../error/AppError";
 import { catchAsync } from "../error/tryCatchAsync";
 import { comparePassword, hashPassword } from "../utils/hashPass";
@@ -7,10 +9,7 @@ import { comparePassword, hashPassword } from "../utils/hashPass";
 export const signupService = async (email: string, username: string,  password: string) => {
 
     const existingUser = await prisma.user.findUnique({
-        where:{
-            email:email,
-            username : username
-        }
+        where:{email}
     })
     if (existingUser){
         throw new AppError("User already exists", 400);
@@ -25,6 +24,5 @@ export const signupService = async (email: string, username: string,  password: 
             password : hashed
         }
     });
-
     return newUser;
 };

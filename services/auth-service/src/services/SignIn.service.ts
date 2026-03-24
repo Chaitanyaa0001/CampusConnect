@@ -1,4 +1,6 @@
-import prisma from "../config/prisma"
+
+
+import { prisma } from "../config/prisma";
 import { AppError } from "../error/AppError";
 import { generateAccessToken, generateRefreshToken } from "../utils/generateToken";
 import { comparePassword } from "../utils/hashPass";
@@ -22,6 +24,9 @@ export const signinService = async (email: string, password: string) => {
     }
     const accessToken = generateAccessToken({userId : user.id, email : user.email});
     const refreshToken = generateRefreshToken({userId : user.id, email : user.email});
+
+    await   
+
     
 
 }
