@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { prisma } from '../config/prisma';
+import { prisma } from '../lib/prisma';
 import { hashToken } from '../utils/hashPass';
 import { AppError } from '../error/AppError';
 
@@ -30,5 +30,5 @@ export const verifyEmailService = async (token:string) => {
     })
 
 
-    return {message: "email verification successful ladle "}; 
-}
+    return {message: "email verification successful ladle "};
+} 

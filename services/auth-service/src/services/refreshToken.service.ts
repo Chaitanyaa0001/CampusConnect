@@ -1,5 +1,5 @@
 
-import { prisma } from "../config/prisma";
+import { prisma } from "../lib/prisma";
 import { AppError } from "../error/AppError";
 import { verifyToken, generateAccessToken } from "../utils/generateToken";
 import { hashToken } from "../utils/hashPass";

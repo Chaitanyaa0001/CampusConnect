@@ -11,7 +11,7 @@ export const signupController = catchAsync(async (req: Request, res: Response) =
     password
   );
 
-  // 👉 send email here (important)
+  //  send email here (important)
   console.log("Verification Token:", verificationToken);
 
   res.status(201).json({

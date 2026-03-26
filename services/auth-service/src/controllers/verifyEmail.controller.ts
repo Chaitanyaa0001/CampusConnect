@@ -7,5 +7,5 @@ export const verifyEmailController = catchAsync(async (req:Request, res: Respons
 
   const result = await verifyEmailService(token as string);
 
-  res.json(result);
+  res.json({message: "Email verified successfully", result});
 });
