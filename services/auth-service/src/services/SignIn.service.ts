@@ -3,7 +3,7 @@
 import { prisma } from "../config/prisma";
 import { AppError } from "../error/AppError";
 import { generateAccessToken, generateRefreshToken } from "../utils/generateToken";
-import { comparePassword } from "../utils/hashPass";
+import { comparePassword, hashToken } from "../utils/hashPass";
 
 export const signinService = async (email: string, password: string) => {
     const user = await prisma.user.findUnique({
@@ -22,11 +22,22 @@ export const signinService = async (email: string, password: string) => {
     if(!user.isVerified){
         throw new AppError("Please verify your email before signing in", 400);
     }
-    const accessToken = generateAccessToken({userId : user.id, email : user.email});
-    const refreshToken = generateRefreshToken({userId : user.id, email : user.email});
+    const accessToken = generateAccessToken({
+        userId : user.id,
+        email : user.email
+    });
+    const refreshToken = generateRefreshToken({
+        userId : user.id,
+        email : user.email
+    });
+    const hashtoken  = await hashToken(refreshToken);
+    await prisma.session.create({
+        data:{
+            userId : user.id,
+            tokenHash : hashtoken,
+            expiresAt : new Date(Date.now() + 7*24*60*60*1000) // 7 days expiry
+        }
+    })
 
-    await pris
-
-    
-
+    return  {accessToken, refreshToken};   
 }
