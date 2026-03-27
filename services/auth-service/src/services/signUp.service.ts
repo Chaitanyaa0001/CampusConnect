@@ -16,7 +16,7 @@ export const signupService = async (email: string, username: string,  password: 
     } 
 
     const hashed = await  hashPassword(password);
-    // generate token for email verification 
+    // generate token for email verification  its random token generate krdiya                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
     const verificationToken = crypto.randomBytes(32).toString("hex");
     const hashtoken  = await hashToken(verificationToken);
 

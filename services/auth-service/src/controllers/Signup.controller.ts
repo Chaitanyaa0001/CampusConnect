@@ -3,8 +3,9 @@ import { catchAsync } from "../error/tryCatchAsync";
 import { signupService } from "../services/signUp.service";
 
 export const signupController = catchAsync(async (req: Request, res: Response) => {
+  // user enters  email password  
   const { email, username, password } = req.body;
-
+  
   const { user, verificationToken } = await signupService(
     email,
     username,

@@ -6,6 +6,9 @@ services:
     ports:
       - "5672:5672"     # app connection
       - "15672:15672"   # UI dashboard
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
     restart: unless-stopped
 
   redis:

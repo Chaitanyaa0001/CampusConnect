@@ -33,6 +33,8 @@ services:
 
 secrets:
   private_key:
-    external: true
+    # external: true in production, but for development we can use a file
+    file: ./secrets/private_key.pem
   public_key:
-    external: true
+    # external: true  in production, but for development we can use a file
+    file: ./secrets/public_key.pem

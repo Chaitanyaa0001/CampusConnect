@@ -35,7 +35,3 @@ export const verifyToken = (token: string) => {
     throw new AppError("Invalid or expired token", 401);
   }
 };
-
-
-
-
