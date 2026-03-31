@@ -3,7 +3,7 @@ import { brevoClient } from "../lib/brevo.client";
 import { catchAsync } from "../error/tryCatchAsync";
 import { env } from "../config/env.config";
 
-export const sendEmailService = catchAsync(async (toEmail:string , token:string) =>{
+export const sendEmailService = async(toEmail:string , token:string) =>{
 
     const url = `${env.CLIENT_URL}/verify-email?token=${token}`;
 
@@ -129,5 +129,4 @@ export const sendEmailService = catchAsync(async (toEmail:string , token:string)
         sender:{name: env.MAIL_FROM_NAME, email: env.MAIL_FROM_EMAIL},
         to:[{email: toEmail}]
     })
-
-})
+}
