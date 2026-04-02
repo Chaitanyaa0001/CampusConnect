@@ -30,5 +30,7 @@ export const verifyEmailService = async (token:string) => {
     })
 
 
+
+    
     return {message: "email verification successful ladle "};
 } 
