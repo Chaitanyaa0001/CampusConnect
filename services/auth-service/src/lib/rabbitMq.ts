@@ -1,4 +1,6 @@
 import amqp from "amqplib";
+import { EXCHANGE } from "../events/exchange";
+import { QUEUES } from "../events/queues";
 
 let channel: amqp.Channel;
 
@@ -8,25 +10,28 @@ export const connectRabbitMQ = async () => {
   );
 
   channel = await connection.createChannel();
-
-  //  MAIN EXCHANGE (topic for flexibility)
-  await channel.assertExchange("auth_exchange", "topic", {
+  // EXCHANGE
+   await channel.assertExchange(EXCHANGE.AUTH, "topic", {durable: true});
+   await channel.assertExchange(EXCHANGE.DEAD_LETTER_QUEUE, "fanout", {durable: true});
+  // queue 
+  
+  await channel.assertQueue(QUEUES.EMAIL_QUEUE,{
     durable: true,
+    deadLetterExchange: EXCHANGE.DEAD_LETTER_QUEUE,
   });
-
   //  DEAD LETTER EXCHANGE
-  await channel.assertExchange("dlx_exchange", "fanout", {
+  await channel.assertExchange(EXCHANGE.DEAD_LETTER_QUEUE, "fanout", {
     durable: true,
   });
 
   // DEAD LETTER QUEUE
-  await channel.assertQueue("dead_letter_queue", {
+  await channel.assertQueue(QUEUES.DEAD_LETTER_QUEUE, {
     durable: true,
   });
 
-  await channel.bindQueue("dead_letter_queue", "dlx_exchange", "");
+  await channel.bindQueue(QUEUES.DEAD_LETTER_QUEUE, EXCHANGE.DEAD_LETTER_QUEUE, "");
 
-  console.log("✅ RabbitMQ connected with Exchange + DLQ");
+  console.log("RabbitMQ connected with Exchange + DLQ");
 
   return channel;
 };

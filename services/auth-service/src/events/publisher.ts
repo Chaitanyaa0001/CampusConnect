@@ -1,13 +1,19 @@
-import { getChannel } from '../lib/rabbitMq';
 
-export const publishEvent = async (routingKey: string,data: object) => {
+import { getChannel } from "../lib/rabbitMq";
+import { EXCHANGE } from "./exchange";
+
+export const publishEvent = async (
+  routingKey: string,
+  data: object
+) => {
   const channel = getChannel();
+
   channel.publish(
-    "auth_exchange",
+    EXCHANGE.AUTH,
     routingKey,
     Buffer.from(JSON.stringify(data)),
     { persistent: true }
   );
 
-  console.log(`Event: ${routingKey}`);
+  console.log(`📤 Event published: ${routingKey}`);
 };
