@@ -15,5 +15,5 @@ export const publishEvent = async (
     { persistent: true }
   );
 
-  console.log(`📤 Event published: ${routingKey}`);
+  console.log(` Event published: ${routingKey}`);
 };
