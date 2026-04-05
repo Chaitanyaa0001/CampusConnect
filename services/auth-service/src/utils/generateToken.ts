@@ -1,37 +1,74 @@
-import jwt from 'jsonwebtoken';
-import { TokenPayload } from '../interfaces/tokenPayload';
-import { PRIVATE_KEY, PUBLIC_KEY } from '../config/keys';
-import { AppError } from '../error/AppError';
+import jwt from "jsonwebtoken";
+import { TokenPayload } from "../interfaces/tokenPayload";
+import { PRIVATE_KEY, PUBLIC_KEY } from "../config/keys";
+import { AppError } from "../error/AppError";
 
-//  generating access token with 15 minutes expiry
-export const generateAccessToken = (tokenPayload: TokenPayload) => {
-    
-    try {
-        return jwt.sign(tokenPayload,PRIVATE_KEY,{
-            algorithm: 'RS256',
-            expiresIn: '15m'
-        })
-    } catch (err) {
-        console.log("AccessToken generation error ");
-        throw new AppError(" Generate Token error", 500)
-    }
-};
-// generating refresh token with 7 days expiry
-export const generateRefreshToken = (tokenPayload: TokenPayload) => {
-    try {
-        return jwt.sign(tokenPayload,PRIVATE_KEY,{
-            algorithm: 'RS256',
-            expiresIn: '7d'
-        })
-    } catch (err) {
-        console.log("RefreshToken generation error ");
-        throw new AppError(" Generate Token error", 500)
-    }
-}
-export const verifyToken = (token: string) => {
+// ✅ Access Token
+export const generateAccessToken = (
+  payload: Omit<TokenPayload, "type">
+) => {
   try {
-    return jwt.verify(token, PUBLIC_KEY) as TokenPayload;
+    return jwt.sign(
+      { ...payload, type: "access" },
+      PRIVATE_KEY,
+      {
+        algorithm: "RS256",
+        expiresIn: "15m",
+      }
+    );
   } catch {
-    throw new AppError("Invalid or expired token", 401);
+    throw new AppError("Generate Access Token error", 500);
+  }
+};
+
+// ✅ Refresh Token
+export const generateRefreshToken = (
+  payload: Omit<TokenPayload, "type">
+) => {
+  try {
+    return jwt.sign(
+      { ...payload, type: "refresh" },
+      PRIVATE_KEY,
+      {
+        algorithm: "RS256",
+        expiresIn: "7d",
+      }
+    );
+  } catch {
+    throw new AppError("Generate Refresh Token error", 500);
+  }
+};
+
+// ✅ Verify Access Token
+export const verifyAccessToken = (token: string) => {
+  try {
+    const payload = jwt.verify(token, PUBLIC_KEY, {
+      algorithms: ["RS256"],
+    }) as TokenPayload;
+
+    if (payload.type !== "access") {
+      throw new AppError("Invalid access token", 401);
+    }
+
+    return payload;
+  } catch {
+    throw new AppError("Invalid or expired access token", 401);
+  }
+};
+
+// ✅ Verify Refresh Token
+export const verifyRefreshToken = (token: string) => {
+  try {
+    const payload = jwt.verify(token, PUBLIC_KEY, {
+      algorithms: ["RS256"],
+    }) as TokenPayload;
+
+    if (payload.type !== "refresh") {
+      throw new AppError("Invalid refresh token", 401);
+    }
+
+    return payload;
+  } catch {
+    throw new AppError("Invalid or expired refresh token", 401);
   }
 };

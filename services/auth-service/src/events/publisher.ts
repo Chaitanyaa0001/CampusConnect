@@ -2,10 +2,7 @@
 import { getChannel } from "../lib/rabbitMq";
 import { EXCHANGE } from "./exchange";
 
-export const publishEvent = async (
-  routingKey: string,
-  data: object
-) => {
+export const publishEvent = async (routingKey: string,data: object) => {
   const channel = getChannel();
 
   channel.publish(

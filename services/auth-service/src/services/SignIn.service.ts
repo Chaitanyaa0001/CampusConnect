@@ -43,5 +43,5 @@ export const signinService = async (email: string, password: string) => {
         }
     })
 
-    return  {accessToken, refreshToken};
+    return  {accessToken, refreshToken, user};
 }
