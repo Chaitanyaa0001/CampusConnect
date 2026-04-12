@@ -3,10 +3,8 @@ import { TokenPayload } from "../interfaces/tokenPayload";
 import { PRIVATE_KEY, PUBLIC_KEY } from "../config/keys";
 import { AppError } from "../error/AppError";
 
-// ✅ Access Token
-export const generateAccessToken = (
-  payload: Omit<TokenPayload, "type">
-) => {
+//  Access Token
+export const generateAccessToken = (payload: Omit<TokenPayload, "type">) => {
   try {
     return jwt.sign(
       { ...payload, type: "access" },
@@ -21,10 +19,8 @@ export const generateAccessToken = (
   }
 };
 
-// ✅ Refresh Token
-export const generateRefreshToken = (
-  payload: Omit<TokenPayload, "type">
-) => {
+// Refresh Token
+export const generateRefreshToken = (payload: Omit<TokenPayload, "type">) => {
   try {
     return jwt.sign(
       { ...payload, type: "refresh" },
@@ -39,7 +35,7 @@ export const generateRefreshToken = (
   }
 };
 
-// ✅ Verify Access Token
+//  Verify Access Token
 export const verifyAccessToken = (token: string) => {
   try {
     const payload = jwt.verify(token, PUBLIC_KEY, {

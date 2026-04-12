@@ -15,7 +15,8 @@ export const signupController = catchAsync(async (req: Request, res: Response) =
    await publishEvent(ROUTING_KEY.AUTH_SIGNUP, {
     email: user.email,
     token: verificationToken
-   })
+   });
+   
   res.status(201).json({
     message: "User created. Please verify email.",
     user,
