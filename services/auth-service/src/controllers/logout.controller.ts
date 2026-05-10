@@ -1,19 +1,36 @@
-// controllers/logout.controller.ts
-import { Request, Response } from "express";
-import { logoutService } from "../services/logout.service";
-import { catchAsync } from "../error/tryCatchAsync";
+import { Request, Response }from "express";
+import { catchAsync }from "../error/tryCatchAsync";
+import { logoutService }from "../services/logout.service";
+import { AppError }from "../error/AppError";
 
-export const logoutController = catchAsync(async (req: Request, res: Response) => {
-  const accessToken = req.headers.authorization?.split(" ")[1];
-  const refreshToken = req.cookies.refreshToken;
+export const logoutController =catchAsync(async (req: Request,res: Response) => {
+      // authorization header
+      const authHeader =req.headers.authorization;
+      if (!authHeader) {
+        throw new AppError("Authorization header missing", 401);
+      }
 
-  if (!accessToken || !refreshToken) {
-    return res.status(400).json({ message: "Tokens missing" });
-  }
+      // extract access token
+      const accessToken =authHeader.split(" ")[1];
+      if (!accessToken) {
+        throw new AppError("Access token missing",401);
+      }
 
-  await logoutService(accessToken, refreshToken);
+      // refresh token from cookie
+      const refreshToken =req.cookies.refreshToken;
+      if (!refreshToken) {
+        throw new AppError("Refresh token missing",401);
+      }
 
-  res.clearCookie("refreshToken");
-
-  res.json({ message: "Logout successful" });
-});
+      // logout logic
+      await logoutService(accessToken,refreshToken);
+      // clear refresh cookie
+      res.clearCookie("refreshToken",{
+          httpOnly: true,
+          secure:process.env.NODE_ENV ==="production",
+          sameSite: "strict",
+        }
+      );
+      return res.status(200).json({success: true,message: "Logout successful",});
+    }
+);

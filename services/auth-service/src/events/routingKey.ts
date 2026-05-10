@@ -1,5 +1,7 @@
 export const ROUTING_KEY = {
-    AUTH_SIGNUP: "auth.signup",
-    AUTH_LOGIN: "auth.login",
-    AUTH_LOGOUT: "auth.logout"
+    EMAIL_VERIFICATION_KEY: "auth.email_verification",
+    USER_CREATED_KEY: "auth.user_created",
+    // dead letter routing keys
+    EMAIL_DLQ_KEY: "auth.email_dlq",
+    USER_DLQ_KEY: "auth.user_dlq",
 }

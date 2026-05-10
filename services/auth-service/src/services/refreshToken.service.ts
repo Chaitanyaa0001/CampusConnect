@@ -8,13 +8,13 @@ import {
 } from "../utils/generateToken";
 
 export const refreshTokenService = async (refreshToken: string) => {
-  //  verify refresh token
+  //  verify refresh token (cokkie se jo token aya usko verify )
   const payload = verifyRefreshToken(refreshToken);
 
-  //  hash token
+  //  databse ka token hash se match krna hoga (jo token aya usko hash krke database me stored hash se compare krna hoga)
   const hashed = await hashToken(refreshToken);
 
-  //  find session
+  //  find session and compare token hash and check expiry
   const session = await prisma.session.findFirst({
     where: {
       userId: payload.userId,
@@ -47,7 +47,7 @@ export const refreshTokenService = async (refreshToken: string) => {
 
   //  store new refresh token
   const newHash = await hashToken(newRefreshToken);
-
+  
   await prisma.session.create({
     data: {
       userId: payload.userId,
@@ -56,8 +56,5 @@ export const refreshTokenService = async (refreshToken: string) => {
     },
   });
 
-  return {
-    accessToken: newAccessToken,
-    refreshToken: newRefreshToken,
-  };
+  return {accessToken: newAccessToken,refreshToken: newRefreshToken,};
 };

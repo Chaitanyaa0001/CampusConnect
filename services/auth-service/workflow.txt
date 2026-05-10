@@ -1,0 +1,18 @@
+signup 
+
+----------------------------------------------------------
+RabbitMQconsumerEMAIL : 
+message received
+   ↓
+email hangs
+   ↓
+5 sec timeout
+   ↓
+error thrown
+   ↓
+catch()
+   ↓
+nack()
+   ↓
+RabbitMQ routes to DLQ
+---------------------------------------------------------

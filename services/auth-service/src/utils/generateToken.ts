@@ -52,7 +52,7 @@ export const verifyAccessToken = (token: string) => {
   }
 };
 
-// ✅ Verify Refresh Token
+//  Verify Refresh Token
 export const verifyRefreshToken = (token: string) => {
   try {
     const payload = jwt.verify(token, PUBLIC_KEY, {

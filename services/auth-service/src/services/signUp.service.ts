@@ -11,6 +11,7 @@ export const signupService = async (email: string, username: string,  password: 
     const existingUser = await prisma.user.findUnique({
         where:{email}
     })
+    
     if (existingUser){
         throw new AppError("User already exists", 400);
     } 
@@ -18,6 +19,7 @@ export const signupService = async (email: string, username: string,  password: 
     const hashed = await  hashPassword(password);
     // generate token for email verification  its random token generate krdiya                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
     const verificationToken = crypto.randomBytes(32).toString("hex");
+    // now hash token 
     const hashtoken  = await hashToken(verificationToken);
 
     const newUser = await prisma.user.create({

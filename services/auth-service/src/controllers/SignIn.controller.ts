@@ -7,11 +7,7 @@ export const signinController  = catchAsync(async (req:Request, res:Response)=>{
     const { email, password } = req.body;
     // extract tokens from sign in service 
     const { user, accessToken, refreshToken } = await signinService(email,password);
-    // retun access and refresh token 
-    await publishEvent(ROUTING_KEY.AUTH_LOGIN,{
-        userId : user.id,
-        username : user.username
-    })
+
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",

@@ -10,6 +10,7 @@ export const getJWKS = () => {
         ...jwk,
         kid: "auth-key-1",   
         alg: "RS256",
+        use: "sig",
       },
     ],
   };
