@@ -10,7 +10,7 @@ export const logoutController =catchAsync(async (req: Request,res: Response) => 
         throw new AppError("Authorization header missing", 401);
       }
 
-      // extract access token
+      // extract access token form this 
       const accessToken =authHeader.split(" ")[1];
       if (!accessToken) {
         throw new AppError("Access token missing",401);
