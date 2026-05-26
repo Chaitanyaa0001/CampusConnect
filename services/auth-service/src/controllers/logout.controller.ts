@@ -16,6 +16,9 @@ export const logoutController =catchAsync(async (req: Request,res: Response) => 
         throw new AppError("Access token missing",401);
       }
 
+
+      
+
       // refresh token from cookie
       const refreshToken =req.cookies.refreshToken;
       if (!refreshToken) {
