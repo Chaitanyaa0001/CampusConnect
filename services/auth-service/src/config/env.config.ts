@@ -1,5 +1,5 @@
 import express from 'express';
-import dotenv from 'dotenv';
+import * as  dotenv from 'dotenv';
 
 dotenv.config();
 
@@ -10,5 +10,6 @@ export const env = {
     BREVO_API_KEY : (process.env.BREVO_API_KEY) ?? (() => { throw new Error("Missing BREVO_API_KEY environment variable") })(),
     MAIL_FROM_NAME : (process.env.MAIL_FROM_NAME) ?? (() => { throw new Error("Missing MAIL_FROM_NAME environment variable") })(),
     MAIL_FROM_EMAIL : (process.env.MAIL_FROM_EMAIL) ?? (() => { throw new Error("Missing MAIL_FROM_EMAIL environment variable") })(),
-    CLIENT_URL : (process.env.CLIENT_URL) ?? (() => { throw new Error("Missing CLIENT_URL environment variable") })()
+    CLIENT_URL : (process.env.CLIENT_URL) ?? (() => { throw new Error("Missing CLIENT_URL environment variable") })(),
+    RABBITMQ_URL : (process.env.RABBITMQ_URL) ?? (() => { throw new Error("Missing RABBITMQ_URL environment variable") })(),
 } 

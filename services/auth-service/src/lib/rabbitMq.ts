@@ -2,13 +2,12 @@ import amqp from "amqplib";
 import { EXCHANGE } from "../events/exchange";
 import { QUEUES } from "../events/queues";
 import { ROUTING_KEY } from "../events/routingKey";
+import { env } from "../config/env.config";
 
 let channel: amqp.Channel;
 
 export const connectRabbitMQ = async () => {
-  const connection = await amqp.connect(
-    process.env.RABBITMQ_URL || "amqp://localhost:5672"
-  );
+  const connection = await amqp.connect(env.RABBITMQ_URL);
 
   channel = await connection.createChannel();
 

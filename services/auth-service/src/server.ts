@@ -6,10 +6,20 @@ import { startConsumer } from './events/consumer';
 
 
 
-connectRabbitMQ();
-startConsumer();
+async function startServer() {
+  try {
+    await connectRabbitMQ();  // Wait for RabbitMQ
+    await startConsumer();     // Wait for consumer to start
+    
 
+    app.listen(env.PORT, () => {
+      console.log(`Auth service running on port  ${env.PORT}`);
+    });
+    
+  } catch (error) {
+    console.error("Failed to start:", error);
+    process.exit(1);
+  }
+}
 
-app.listen(env.PORT, () => {
-  console.log(`Auth service running on ports ${env.PORT}`);
-});
+startServer();
