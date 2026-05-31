@@ -1,0 +1,9 @@
+# auth-service/pnpm-workspace.yaml
+packages:
+  - "."
+
+# This is the modern v11 property replacing onlyBuiltDependencies
+allowBuilds:
+  - "@prisma/engines"
+  - "bcrypt"
+  - "prisma"
