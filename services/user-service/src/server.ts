@@ -6,11 +6,10 @@ import {env} from './config/env.config'
 
 async function startServer() {
   try {
-
-
     app.listen(env.PORT, () => {
-      console.log(`Auth service running on port  ${env.PORT}`);
+      console.log(`User service running on port  ${env.PORT}`);
     });
+
     
   } catch (error) {
     console.error("Failed to start:", error);
