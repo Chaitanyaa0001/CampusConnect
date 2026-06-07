@@ -7,7 +7,7 @@ import crypto from 'crypto'
 
 export const signupService = async (email: string, username: string,  password: string) => {
 
-    // if user exists throw error ladle
+    // if user exists throw error 
     const existingUser = await prisma.user.findUnique({
         where:{email}
     })

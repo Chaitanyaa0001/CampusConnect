@@ -8,6 +8,7 @@ import { ROUTING_KEY } from "../events/routingKey";
 export const signupController = catchAsync(async (req: Request, res: Response) => {
   const { email, username, password} = req.body;
   const { user, verificationToken } = await signupService(email,username,password);
+  
    await publishEvent(ROUTING_KEY.EMAIL_VERIFICATION_KEY, {
     email: user.email,
     token: verificationToken
