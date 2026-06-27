@@ -13,3 +13,30 @@ export const env = {
     CLIENT_URL : (process.env.CLIENT_URL) ?? (() => { throw new Error("Missing CLIENT_URL environment variable") })(),
     RABBITMQ_URL : (process.env.RABBITMQ_URL) ?? (() => { throw new Error("Missing RABBITMQ_URL environment variable") })(),
 } 
+
+// model User {
+//   id        String   @id @default(uuid()) 
+//   email     String   @unique
+//   username  String   @unique
+//   password  String
+//   isVerified Boolean  @default(false)
+
+//   verificationToken String?
+//   verificationTokenExpiry DateTime?
+
+//   sessions  Session[]
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
+
+// model Session {
+//   id        String   @id @default(uuid())
+//   userId    String
+//   tokenHash  String   @unique
+//   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   createdAt DateTime @default(now())
+//   expiresAt DateTime
+//   @@index([userId])
+// }

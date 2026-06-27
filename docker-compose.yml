@@ -17,19 +17,19 @@ services:
       - public_key
     restart: unless-stopped
 
-  # user-service:
-  #   build: ./services/user-service
-  #   ports:
-  #     - "3001:3000"
-  #   env_file:
-  #     - ./services/user-service/.env
-  #   environment:
-  #     NODE_ENV: production
-  #   command: pnpm start
-  #   depends_on:
-  #     - rabbit-mq
-  #     - postgres
-  #   restart: unless-stopped
+  user-service:
+    build: ./services/user-service
+    ports:
+      - "3001:3000"
+    env_file:
+      - ./services/user-service/.env
+    environment:
+      NODE_ENV: production
+    command: pnpm start
+    depends_on:
+      - rabbit-mq
+      - postgres
+    restart: unless-stopped
 
 secrets:
   private_key:

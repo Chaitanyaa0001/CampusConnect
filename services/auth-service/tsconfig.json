@@ -9,7 +9,6 @@
     // See also https://aka.ms/tsconfig/module
     "module": "commonjs",
     "target": "es2020",
-    "types": [],
     // For nodejs:
     "lib": ["ES2020"],
     "types": ["node"],
@@ -40,7 +39,11 @@
     // "verbatimModuleSyntax": true,
     // "isolatedModules": true,
     // "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
-    "skipLibCheck": true,
-  }
+    // "moduleDetection": "force", 
+    // "skipLibCheck": true,
+  },
+  "include": ["src/**/*"],
+  "exclude": ["prisma.config.ts"]
 }
+
+
