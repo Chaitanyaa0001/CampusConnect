@@ -3,6 +3,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
 import authRoutes from './routes/authWrapper.route';
+import jwksRoutes from './routes/jwks.route';
 
 
 const app = express();
@@ -14,10 +15,11 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/api/auth", authRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/jwks', jwksRoutes);
 
 app.get("/api", (req, res) =>{
-    return res.status(200).json({ message: "Auth service running on port gandu  " });
+    return res.status(200).json({ message: "Auth service running on port   " });
 })
 
 export default app;
