@@ -35,7 +35,8 @@ export const verifyEmailService = async (token:string) => {
     // user verified successfully, publish event for user data in user service
     await publishEvent(ROUTING_KEY.USER_CREATED_KEY, {
         userId: updateduser.id,
-        email: updateduser.email
+        email: updateduser.email,
+        username: updateduser.username
     });
     
     return {message: "email verification successful ladle "};

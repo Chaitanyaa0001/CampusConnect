@@ -11,3 +11,28 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  // Primary Identity (same ID as Auth Service)
+  id          String   @id
+
+  // Read model (owned by Auth Service, synchronized via events)
+  username String @unique
+  email    String @unique
+  bio      String?  @db.VarChar(250)
+
+
+  profileImagePublicId String? // image ki id jisse delete hoga updation ke time 
+  profileImageUrl      String?  // image ka url jisse frontend pe show hoga
+
+  
+
+  // Statistics (maintained through events)
+  carpoolCount     Int @default(0)
+  carentalCount      Int @default(0)
+  projectCount     Int @default(0)
+  lostFoundCount   Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

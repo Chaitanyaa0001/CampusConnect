@@ -1,16 +1,21 @@
 import { start } from 'node:repl';
 
+import { env } from './config/env.config.js';
+import { connectRabbitMQ } from './lib/rabbitMq.js';
+import { startConsumer } from './events/consumer.js';
+import { prisma } from './lib/prisma.js';
 import app from './app.js';
 
 
 
 async function startServer() {
   try {
-    console.log("DATABASE_URL =", env.DATABASE_URL);
     await prisma.$connect();
     console.log("Connected to the database successfully.");
 
-    
+    await connectRabbitMQ();  // Wait for RabbitMQ
+    await startConsumer();
+
     app.listen(env.PORT, () => {
       console.log(`Auth service running on port  ${env.PORT}`);
     });

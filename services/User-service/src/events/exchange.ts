@@ -1,4 +1,4 @@
 export const EXCHANGE = {
-    AUTH: "auth_exchange",
-    DEAD_LETTER_EXCHANGE: "dlx_exchange",
-}
+    AUTH: "auth.exchange",
+    DEAD_LETTER_EXCHANGE: "dead_letter_exchange",
+};

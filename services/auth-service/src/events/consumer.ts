@@ -15,12 +15,10 @@ export const startConsumer = async () => {
         }
         try {
           const data = JSON.parse(msg.content.toString());
-          console.log("Received message:",data);
           // timeout protection
           await Promise.race([
             sendEmailService(data.email,data.token),
             timeoutPromise(5000)
-
           ]);
           // success
           channel.ack(msg);
