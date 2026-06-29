@@ -1,3 +1,3 @@
-import InternshipDetailsPage from "@/features/student/car-rental/routes/InternshipDetailsPage";
+import CarpoolDetailPage from "@/features/student/carpool/routes/CarpoolDetailPage";
 
-export default InternshipDetailsPage;
+export default CarpoolDetailPage;

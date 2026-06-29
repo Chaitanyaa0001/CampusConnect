@@ -12,7 +12,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   return (
     <>
       <aside
-        className={`fixed  left-0 h-[640px] lg:h-[645px] w-64 border-r bg-white dark:border-gray-500 dark:bg-[#314DA2] dark:bg-gradient-to-b from-[#0A0F1C] via-[#101828] to-[#1A2234] shadow-md flex flex-col justify-between p-4 transform transition-transform duration-300 z-40
+        className={`fixed  mt-2 left-0 h-[640px] lg:h-[785px] w-64 border-r bg-white dark:border-gray-500 dark:bg-[#314DA2] dark:bg-gradient-to-b from-[#0A0F1C] via-[#101828] to-[#1A2234] shadow-md flex flex-col justify-between p-4 transform transition-transform duration-300 z-40
         ${isOpen ? "translate-x-0 top-0" : "-translate-x-full top-0"} 
         lg:translate-x-0 lg:top-21`}  // 👈 on large screens, start below navbar
       >

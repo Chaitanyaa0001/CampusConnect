@@ -1,5 +1,5 @@
 import AppNavbar from "@/shared/components/navigation/AppNavbar";
-import AIMentorClient from "@/features/student/public-chat/components/AIMentorClient";
+import AIMentorClient from "@/features/student/public-chat/components/PublicChatClient";
 
 export default function AIMentorPage() {
   return (

@@ -1,3 +1,3 @@
-import BrowseInternshipsPage from "@/features/student/car-rental/routes/BrowseInternshipsPage";
+import ResumeUploadPage from "@/features/student/carpool/routes/ResumeUploadPage";
 
-export default BrowseInternshipsPage;
+export default ResumeUploadPage;
