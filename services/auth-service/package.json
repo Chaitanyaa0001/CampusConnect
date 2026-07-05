@@ -13,10 +13,12 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@auth-sdk": "file:../../auth-sdk",
     "@getbrevo/brevo": "^5.0.3",
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
     "amqplib": "^1.0.2",
+    "auth-sdk": "file:../../auth-sdk",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",

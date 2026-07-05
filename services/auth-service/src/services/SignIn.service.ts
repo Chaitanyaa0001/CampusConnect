@@ -5,14 +5,14 @@ import { AppError } from "../error/AppError";
 import { generateAccessToken, generateRefreshToken } from "../utils/generateToken";
 import { comparePassword, hashToken } from "../utils/hashPass";
 
-export const signinService = async (email: string, password: string) => {
+export const signinService = async (email: string, password: string, username: string) => {
     const user = await prisma.user.findUnique({
         where: {
-            email: email
+            email: email,
         }
     })
     if(!user){
-        throw new AppError("Invalid email or password", 400);
+        throw new AppError("check your crediantails", 400);
     }
     // match pass word 
     const match  = await comparePassword(password, user.password);
@@ -26,11 +26,13 @@ export const signinService = async (email: string, password: string) => {
     // generate tokens 
     const accessToken = generateAccessToken({
         userId : user.id,
-        email : user.email
+        email : user.email,
+        username : user.username
     });
     const refreshToken = generateRefreshToken({
         userId : user.id,
-        email : user.email
+        email : user.email,
+        username : user.username
     });
     // hashtoken 
     const hashtoken  = await hashToken(refreshToken);

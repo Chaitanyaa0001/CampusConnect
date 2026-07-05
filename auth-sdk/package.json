@@ -1,0 +1,50 @@
+{
+  "name": "@auth-sdk",
+  "version": "1.0.0",
+  "description": "Authentication SDK for  microservices",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./config": {
+      "import": "./dist/config/auth.config.js",
+      "types": "./dist/config/auth.config.d.ts"
+    },
+    "./middleware": {
+      "import": "./dist/middleware/authenticate.js",
+      "types": "./dist/middleware/authenticate.d.ts"
+    },
+    "./types": {
+      "import": "./dist/types/tokenpayload.js",
+      "types": "./dist/types/tokenpayload.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm run build"
+  },
+  "keywords": ["authentication", "jwt", "microservices", "campusconnect"],
+  "author": "Chaitanya Khurana",
+  "license": "MIT",
+  "files": ["dist"],
+  "dependencies": {
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "jwks-rsa": "^4.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
