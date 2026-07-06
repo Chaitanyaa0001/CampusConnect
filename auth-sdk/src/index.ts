@@ -1,4 +1,5 @@
 // Core exports
+import './types/express.js'
 export * from "./config/auth.config.js";
 export * from "./middleware/authenticate.js";
 export * from "./jwks/client.js";
