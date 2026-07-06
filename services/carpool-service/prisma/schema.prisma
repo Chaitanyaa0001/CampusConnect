@@ -11,3 +11,40 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model Ride {
+
+  id             String      @id @default(cuid())
+
+  userId         String
+
+  fromLocation   String
+  toLocation     String
+
+  departureAt    DateTime
+
+  vehicleType    String?
+  vehicleName    String?
+
+  price          Int
+
+  totalSeats     Int
+  bookedSeats    Int @default(0)
+
+  description    String?
+
+  status         RideStatus @default(OPEN)
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  bookings       Booking[]
+}
+enum Booking {
+  CONFIRMED
+  CANCELLED
+}
+enum RideStatus {
+  OPEN
+  CLOSED
+}
