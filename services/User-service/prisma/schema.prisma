@@ -29,7 +29,7 @@ model User {
 
   // Statistics (maintained through events)
   carpoolCount     Int @default(0)
-  carentalCount      Int @default(0)
+  carRentalCount   Int @default(0)
   projectCount     Int @default(0)
   lostFoundCount   Int @default(0)
 

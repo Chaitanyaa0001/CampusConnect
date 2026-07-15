@@ -25,12 +25,9 @@ export default function LoginRoute() {
               Sign in to your account and continue your journey with CampusConnect
             </p>
           </div>
-<LoginForm />
-        
-          
+          <LoginForm />
         </div>
       </div>
-
       {/* Right Section */}
       <div className="order-2 md:order-2 hidden md:flex flex-1 items-center justify-center bg-gray-50 dark:bg-gray-800">
         <div className="max-w-md text-center space-y-6">

@@ -4,9 +4,9 @@ import { signinService } from "../services/SignIn.service";
 import { publishEvent } from "../events/publisher";
 import { ROUTING_KEY } from "../events/routingKey";
 export const signinController  = catchAsync(async (req:Request, res:Response)=>{
-    const { email, password } = req.body;
+    const { email, password,username } = req.body;
     // extract tokens from sign in service 
-    const { user, accessToken, refreshToken } = await signinService(email,password);
+    const { user, accessToken, refreshToken } = await signinService(email,password,username);
 
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,

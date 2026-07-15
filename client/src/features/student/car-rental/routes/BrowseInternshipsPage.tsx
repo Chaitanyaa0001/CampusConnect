@@ -113,7 +113,7 @@ export default function BrowseInternshipsPage() {
       skills: ["Sedan", "Automatic", "Available Weekend"],
       description: "Comfortable automatic sedan for long drives and airport pickup drops.",
       status: "Available",
-    },
+    },  
   ];
 
   return (

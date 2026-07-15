@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { catchAsync } from "../error/tryCatchAsync.js";
-import { getAllRides } from "../services/getAllrides.service.js";
+import { getAllRidesService } from "../services/getAllrides.service.js";
 import { AppError } from "../error/AppError.js";
 
 
@@ -9,7 +9,7 @@ export const getAllRidesController = catchAsync(async (req: Request, res: Respon
     if(!user){
         throw  new AppError("User not authenticated", 401);
     }
-        const rides = await getAllRides({
+        const rides = await getAllRidesService({
             from: req.query.from as string,
             to: req.query.to as string,
             date: req.query.date as string,

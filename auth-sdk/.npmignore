@@ -1,0 +1,9 @@
+src/
+node_modules/
+.env
+*.log
+tsconfig.json
+.git/
+.github/
+*.ts
+!*.d.ts

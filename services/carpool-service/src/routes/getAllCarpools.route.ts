@@ -4,6 +4,6 @@ import { authenticate } from 'auth-sdk/middleware';
 
 const router = express.Router();
 
-router.get('/',authenticate,getAllRidesController);
+router.get('/rides', authenticate, getAllRidesController);
 
 export default router;
