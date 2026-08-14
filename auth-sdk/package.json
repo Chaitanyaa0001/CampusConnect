@@ -1,5 +1,5 @@
 {
-  "name": "@auth-sdk",
+  "name": "auth-sdk",
   "version": "1.0.0",
   "description": "Authentication SDK for  microservices",
   "main": "./dist/index.js",
