@@ -1,17 +1,17 @@
 import { Router } from "express";
 
-import bookCarpoolroute from "./bookCarpool.route";
-import getCarpoolroute from "./getAllCarpools.route";
-import getCarpoolByMeRoute from "./getCarpoolbyID.route";
-import createCarpoolroute from "./postCarpool.route";
+import getProjectroute from "./getAllProjects.route.js";
+import getProjectByMeRoute from "./getProjectsbyMe.route.js";
+import createProjectroute from "./postProjects.route.js";
+import getProjectByIDRoute from "./getProjectsByID.route.js";   
 
 
 const router = Router();
 
-router.use(getCarpoolroute);
-router.use(getCarpoolByMeRoute);
-router.use(bookCarpoolroute);
-router.use(createCarpoolroute);
+router.use(getProjectroute);
+router.use(getProjectByMeRoute);
+router.use(createProjectroute);
+router.use(getProjectByIDRoute);
 
 
 export default router;

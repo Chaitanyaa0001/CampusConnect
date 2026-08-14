@@ -2,7 +2,7 @@ import { start } from 'node:repl';
 
 import { env } from './config/env.config.js';
 import { connectRabbitMQ } from './lib/rabbitMq.js';
-import { startConsumer } from './events/consumer.js';
+import { startConsumer } from './events/index.js';
 import { prisma } from './lib/prisma.js';
 import app from './app.js';
 

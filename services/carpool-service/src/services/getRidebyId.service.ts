@@ -1,10 +1,10 @@
 import {prisma }from '../utils/prisma.client';
 
-export const getUserRides = async (userId: string) => {
-  const rides = await prisma.ride.findMany({
+export const getRideByIdService = async (rideId: string) => {
+  const ride = await prisma.ride.findUnique({
     where: {
-      userId
+      id: rideId
     }
   });
-  return rides;
+  return ride;
 };

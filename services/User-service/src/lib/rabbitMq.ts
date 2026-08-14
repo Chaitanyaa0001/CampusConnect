@@ -24,12 +24,20 @@ export const connectRabbitMQ = async () => {
         'deadLetterRoutingKey':ROUTING_KEY.USER_DLQ_KEY,
       }
     );
+    await channel.assertQueue(QUEUES.CARPOOL_QUEUE, {
+      durable: true,
+      'deadLetterExchange': EXCHANGE.DEAD_LETTER_EXCHANGE,
+      'deadLetterRoutingKey': ROUTING_KEY.CARPOOL_DLQ_KEY,
+    });
     // DLQ
     await channel.assertQueue(QUEUES.DEAD_LETTER_QUEUE_FOR_USER,{durable: true,});
+    await channel.assertQueue(QUEUES.DEAD_LETTER_QUEUE_FOR_CARPOOL, { durable: true });
     // Bind Queue
     await channel.bindQueue(QUEUES.USER_QUEUE,EXCHANGE.AUTH,ROUTING_KEY.USER_CREATED_KEY);
+    await channel.bindQueue(QUEUES.CARPOOL_QUEUE, EXCHANGE.AUTH, ROUTING_KEY.CARPOOL_CREATED_KEY);
     // Bind DLQ
     await channel.bindQueue(QUEUES.DEAD_LETTER_QUEUE_FOR_USER,EXCHANGE.DEAD_LETTER_EXCHANGE,ROUTING_KEY.USER_DLQ_KEY);
+    await channel.bindQueue(QUEUES.DEAD_LETTER_QUEUE_FOR_CARPOOL, EXCHANGE.DEAD_LETTER_EXCHANGE, ROUTING_KEY.CARPOOL_DLQ_KEY);
     console.log("RabbitMQ Connected");
     return channel;
 };

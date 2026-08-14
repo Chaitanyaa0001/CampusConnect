@@ -1,10 +1,10 @@
 import express from "express";
 import { authenticate } from "auth-sdk";
 
-import { getCarpoolbyIdController } from "../controllers/getCarpoolbyId.controller";
+import { getProjectByIdController } from "../controllers/getProjectsbyId.controller.js";
 
 const router = express.Router();
 
-router.get("/:id", authenticate, getCarpoolbyIdController);
+router.get("/:id", authenticate, getProjectByIdController);
 
 export default router;

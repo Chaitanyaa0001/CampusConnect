@@ -1,45 +1,57 @@
-import { prisma } from "../utils/prisma.client";
-import { ICreateRideInput, IGetRideFilters } from "../interface/interface";
+import { prisma } from "../utils/prisma.js";
+import {IGetProjectFilters} from '../interface/IProjectsInput.js'
 
-export const getAllRidesService = async ({from,to,date,page = 1,limit = 10,}: IGetRideFilters) => {
+export const getAllProjectsService = async ({search,status,page = 1,limit = 10,}: IGetProjectFilters) => {
     const where: any = {};
-    if (from) {
-        where.fromLocation = {
-            contains: from,
-            mode: "insensitive", // to prevent lower and upper case 
-        };
-    }
+    if (search) {
+        where.OR = [
+            {
+                title: {
+                    contains: search,
+                    mode: "insensitive",
+                },
+            },
+            {
+                description: {
+                    contains: search,
+                    mode: "insensitive",
+                },
+            },
 
-    if (to) {
-        where.toLocation = {
-            contains: to,
-            mode: "insensitive",
-        };
+        ];
     }
-    if (date) {
-        const start = new Date(date);
-        start.setHours(0, 0, 0, 0);
-
-        const end = new Date(date);
-        end.setHours(23, 59, 59, 999);
-
-        where.departureAt = {
-            gte: start,
-            lte: end,
-        };
+    if (status) {
+        where.status = status;
     }
-    const skip = (page - 1) * limit;     //to skip in pagination 
-    const total = await prisma.ride.count({
-        where,
-    });
-    const rides = await prisma.ride.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: {
-            departureAt: "asc",
+    const skip =
+        (page - 1) * limit;
+    const total =
+        await prisma.project.count({
+            where,
+        });
+
+    const projects =
+        await prisma.project.findMany({
+            where,
+            skip,
+            take: limit,
+            orderBy: {
+                createdAt: "desc",
+            },
+        });
+    return {projects,
+        pagination: {
+            total,
+            page,
+            limit,
+            totalPages:
+                Math.ceil(
+                    total / limit
+                ),
+            hasNext:
+                page * limit < total,
+            hasPrev:
+                page > 1,
         },
-    });
-    return {rides,pagination: {total,page,limit,totalPages: Math.ceil(total / limit),},
     };
 };

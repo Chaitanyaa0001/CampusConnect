@@ -1,5 +1,5 @@
 
-/generated/prisma
+./generated
 .env
 ./node_modules
 ./agents

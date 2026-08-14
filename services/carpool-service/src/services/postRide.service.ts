@@ -1,3 +1,5 @@
+import { publishEvent } from "../events/publisher";
+import { ROUTING_KEY } from "../events/routingKey";
 import { ICreateRideInput } from "../interface/interface";
 import { prisma } from "../utils/prisma.client";
 
@@ -15,6 +17,10 @@ export const postRideService = async (data: ICreateRideInput, userId: string) =>
             description: data.description,
         },
     });
+    await publishEvent(ROUTING_KEY.CARPOO_KEY, {
+            rideId: ride.id,
+            userId: ride.userId,
+        });
 
     return ride;
 };

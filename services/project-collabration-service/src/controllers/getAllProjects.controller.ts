@@ -1,25 +1,25 @@
 import { Request, Response } from "express";
-import { catchAsync } from "../error/tryCatchAsync.js";
-import { getAllRidesService } from "../services/getAllrides.service.js";
-import { AppError } from "../error/AppError.js";
+import { AppError } from "../error/AppError";
+import { catchAsync } from "../error/tryCatchAsync";
+import {getAllProjectsService} from "../services/getAllProjects.service";
+import {ProjectStatus} from "../interface/IProjectsInput";
 
-
-export const getAllRidesController = catchAsync(async (req: Request, res: Response) => {
-    const user = req.user;
-    if(!user){
-        throw  new AppError("User not authenticated", 401);
-    }
-        const rides = await getAllRidesService({
-            from: req.query.from as string,
-            to: req.query.to as string,
-            date: req.query.date as string,
-            page: Number(req.query.page) || 1,
-            limit: Number(req.query.limit) || 10,
+export const getAllProjectsController = catchAsync(
+    async (req: Request, res: Response) => {
+        const user = req.user;
+        if (!user) {
+            throw new AppError("User not authenticated",401);
+        }
+        const projects = await getAllProjectsService({
+            search:
+                req.query.search as string,
+            status:
+                req.query.status as ProjectStatus,
+            page:
+                Number(req.query.page) || 1,
+            limit:
+                Number(req.query.limit) || 10,
         });
-
-        return res.status(200).json({
-            success: true,
-            data: rides,
-        });
+        return res.status(200).json({success: true,data: projects,});
     }
 );

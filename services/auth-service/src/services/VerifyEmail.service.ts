@@ -1,4 +1,3 @@
-import crypto from 'crypto';
 import { prisma } from '../lib/prisma';
 import { hashToken } from '../utils/hashPass';
 import { AppError } from '../error/AppError';
@@ -21,7 +20,7 @@ export const verifyEmailService = async (token:string) => {
         throw new AppError("Invalid or expired token", 400);
     }
     // update user 
-  const updateduser =  await prisma.user.update({
+  const updatedUser =  await prisma.user.update({
         where:{
             id: user.id,
         },
@@ -34,9 +33,9 @@ export const verifyEmailService = async (token:string) => {
 
     // user verified successfully, publish event for user data in user service
     await publishEvent(ROUTING_KEY.USER_CREATED_KEY, {
-        userId: updateduser.id,
-        email: updateduser.email,
-        username: updateduser.username
+        userId: updatedUser.id,
+        email: updatedUser.email,
+        username: updatedUser.username
     });
     
     return {message: "email verification successful ladle "};

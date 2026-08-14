@@ -5,9 +5,30 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model Project {
+  id             String        @id @default(cuid())
+  userId         String
+  title          String
+  description    String?
+  status         ProjectStatus @default(IDEA_VALIDATION)
+  isOpen         Boolean       @default(true)
+  teamSize       Int           @default(1)
+  membersNeeded  Int           @default(0)
+  techStack      String[]
+  requiredSkills String[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+enum ProjectStatus {
+  IDEA_VALIDATION
+  BUILDING_MVP
+  COMPLETED
 }

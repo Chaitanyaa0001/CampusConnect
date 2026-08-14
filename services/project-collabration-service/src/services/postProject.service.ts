@@ -1,26 +1,35 @@
-import { publishEvent } from "../events/publisher";
-import { ROUTING_KEY } from "../events/routingKey";
-import { ICreateRideInput } from "../interface/interface";
-import { prisma } from "../utils/prisma.client";
+import { publishEvent } from "../events/publisher.js";
+import { ROUTING_KEY } from "../events/routingKey.js";
+import { ICreateProjectInput } from "../interface/IProjectsInput.js";
+import { prisma } from "../utils/prisma.js";
 
-export const postRideService = async (data: ICreateRideInput, userId: string) => {
-    const ride = await prisma.ride.create({
+export const postProjectService = async (data: ICreateProjectInput,userId: string) => {
+    const project = await prisma.project.create({
         data: {
             userId,
-            fromLocation: data.fromLocation,
-            toLocation: data.toLocation,
-            departureAt: data.departureAt,
-            vehicleName: data.vehicleName,
-            price: data.price,
-            totalSeats: data.totalSeats,
-            bookedSeats: 0,
+            title: data.title,
             description: data.description,
+            status:
+                data.status ?? "IDEA_VALIDATION",
+            isOpen:
+                data.isOpen ?? true,
+            teamSize:
+                data.teamSize ?? 1,
+            membersNeeded:
+                data.membersNeeded ?? 0,
+            techStack:
+                data.techStack,
         },
     });
-    await publishEvent(ROUTING_KEY.CARPOOL_CREATED_KEY, {
-            rideId: ride.id,
-            userId: ride.userId,
-        });
 
-    return ride;
+    await publishEvent(
+        ROUTING_KEY.PROJECTS_KEY,
+        {
+            projectId: project.id,
+            userId: project.userId,
+        }
+    );
+
+
+    return project;
 };

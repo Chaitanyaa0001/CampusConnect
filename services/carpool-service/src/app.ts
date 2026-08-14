@@ -11,7 +11,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(cookieParser());
 
-app.use("/carpools", carpoolRoutes);
+app.use("/carpool", carpoolRoutes);
 
 app.get("/", (req, res) => {
     res.send("Hello, Carpool Service!");

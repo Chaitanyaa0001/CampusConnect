@@ -38,11 +38,13 @@ export const refreshTokenService = async (refreshToken: string) => {
   const newAccessToken = generateAccessToken({
     userId: payload.userId,
     email: payload.email,
+    username: payload.username
   });
 
   const newRefreshToken = generateRefreshToken({
     userId: payload.userId,
     email: payload.email,
+    username: payload.username
   });
 
   //  store new refresh token

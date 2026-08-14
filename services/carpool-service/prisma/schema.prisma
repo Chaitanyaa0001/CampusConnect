@@ -2,7 +2,7 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -15,7 +15,6 @@ model Ride {
   fromLocation   String
   toLocation     String
   departureAt    DateTime
-  vehicleType    String?
   vehicleName    String?
   price          Int
   totalSeats     Int
@@ -25,18 +24,9 @@ model Ride {
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
   
-  bookings       Booking[]
 }
 
-model Booking {
-  id             String      @id @default(cuid())
-  rideId         String
-  userId         String
-  status         BookingStatus @default(CONFIRMED)
-  createdAt      DateTime    @default(now())
-  
-  ride           Ride        @relation(fields: [rideId], references: [id])
-}
+
 
 enum RideStatus {
   OPEN
@@ -44,8 +34,3 @@ enum RideStatus {
   CANCELLED
 }
 
-enum BookingStatus {
-  CONFIRMED
-  CANCELLED
-  PENDING
-}
