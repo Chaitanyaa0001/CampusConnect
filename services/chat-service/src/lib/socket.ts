@@ -1,159 +1,129 @@
-// import type { Server as HttpServer } from "node:http";
+import type { Server as HttpServer } from "node:http";
 
-// import { Server, type Namespace, type Socket } from "socket.io";
+import { authenticateSocket, type TokenPayload } from "auth-sdk";
+import { Server, type Socket } from "socket.io";
 
-// import { authenticateSocket } from "../middleware/authenticate-socket.js";
-// import type { TokenPayload } from "auth-sdk";
+import { prisma } from "../utils/prima.client.js";
 
-// export type ChatSocket = Socket & {
-//     data: {
-//         user?: TokenPayload;
-//     };
-// };
+type PublicMessagePayload = {
+    content?: string;
+    message?: string;
+};
 
-// let io: Server | undefined;
+export type ChatSocket = Socket & {
+    data: {
+        user?: TokenPayload;
+    };
+};
 
-// const getDmRoomName = (userIdA: string, userIdB: string) => {
-//     return [userIdA, userIdB].sort().join(":");
-// };
+const PUBLIC_CHAT_ROOM = "public";
+const PUBLIC_CHAT_HISTORY_LIMIT = 50;
+const PUBLIC_CHAT_MESSAGE_MAX_LENGTH = 1_000;
 
-// const allowedFeedRooms = new Set(["public", "carpool", "project", "lost-found", "car-rental"]);
+let io: Server | undefined;
 
-// const registerAuthenticatedNamespace = (namespace: Namespace) => {
-//     namespace.use(authenticateSocket);
-//     return namespace;
-// };
+const toPublicMessage = (message: {
+    id: string;
+    userId: string;
+    content: string;
+    createdAt: Date;
+}) => ({
+    id: message.id,
+    userId: message.userId,
+    content: message.content,
+    message: message.content,
+    createdAt: message.createdAt.toISOString(),
+});
 
-// export const initSocketServer = (server: HttpServer) => {
-//     io = new Server(server, {
-//         cors: {
-//             origin: true,
-//             credentials: true,
-//         },
-//     });
+const normalizePublicMessage = (payload: PublicMessagePayload) => {
+    const content = (payload?.content ?? payload?.message ?? "").trim();
 
-//     const publicNamespace = registerAuthenticatedNamespace(io.of("/public-chat"));
-//     const dmNamespace = registerAuthenticatedNamespace(io.of("/dm"));
-//     const feedNamespace = registerAuthenticatedNamespace(io.of("/feeds"));
+    if (!content) {
+        return undefined;
+    }
 
-//     publicNamespace.on("connection", (socket: ChatSocket) => {
-//         socket.join("public");
+    return content.slice(0, PUBLIC_CHAT_MESSAGE_MAX_LENGTH);
+};
 
-//         socket.on("public:message", (payload: { message?: string }) => {
-//             const message = payload?.message?.trim();
+export const initSocketServer = (server: HttpServer) => {
+    io = new Server(server, {
+        cors: {
+            origin: true,
+            credentials: true,
+        },
+    });
 
-//             if (!message) {
-//                 return;
-//             }
+    const publicNamespace = io.of("/public-chat");
+    publicNamespace.use(authenticateSocket);
 
-//             io?.of("/public-chat").to("public").emit("public:message", {
-//                 message,
-//                 sender: socket.data.user,
-//                 createdAt: new Date().toISOString(),
-//             });
-//         });
-//     });
+    publicNamespace.on("connection", async (socket: ChatSocket) => {
+        const user = socket.data.user;
 
-//     feedNamespace.on("connection", (socket: ChatSocket) => {
-//         socket.on("feed:join", (payload: { room?: string }) => {
-//             const room = payload?.room;
+        if (!user?.userId) {
+            socket.disconnect(true);
+            return;
+        }
 
-//             if (!room || !allowedFeedRooms.has(room)) {
-//                 return;
-//             }
+        socket.join(PUBLIC_CHAT_ROOM);
+        socket.emit("public:joined", { room: PUBLIC_CHAT_ROOM, user });
 
-//             socket.join(room);
-//             socket.emit("feed:joined", { room });
-//         });
+        try {
+            const messages = await prisma.message.findMany({
+                orderBy: { createdAt: "desc" },
+                take: PUBLIC_CHAT_HISTORY_LIMIT,
+            });
 
-//         socket.on("feed:message", (payload: { room?: string; message?: string }) => {
-//             const room = payload?.room;
-//             const message = payload?.message?.trim();
+            socket.emit("public:history", messages.reverse().map(toPublicMessage));
+        } catch (error) {
+            console.error("Failed to load public chat history:", error);
+            socket.emit("public:error", { message: "Unable to load chat history" });
+        }
 
-//             if (!room || !allowedFeedRooms.has(room) || !message) {
-//                 return;
-//             }
+        socket.on("public:message", async (payload: PublicMessagePayload, ack?: (response: unknown) => void) => {
+            const content = normalizePublicMessage(payload);
 
-//             feedNamespace.to(room).emit("feed:message", {
-//                 room,
-//                 message,
-//                 sender: socket.data.user,
-//                 createdAt: new Date().toISOString(),
-//             });
-//         });
-//     });
+            if (!content) {
+                ack?.({ ok: false, error: "Message cannot be empty" });
+                return;
+            }
 
-//     dmNamespace.on("connection", (socket: ChatSocket) => {
-//         socket.on("dm:join", (payload: { otherUserId?: string }) => {
-//             const userId = socket.data.user?.userId;
-//             const otherUserId = payload?.otherUserId;
+            try {
+                const savedMessage = await prisma.message.create({
+                    data: {
+                        userId: user.userId,
+                        content,
+                    },
+                });
+                const outgoingMessage = {
+                    ...toPublicMessage(savedMessage),
+                    sender: {
+                        userId: user.userId,
+                        email: user.email,
+                        username: user.username,
+                    },
+                };
 
-//             if (!userId || !otherUserId) {
-//                 return;
-//             }
+                publicNamespace.to(PUBLIC_CHAT_ROOM).emit("public:message", outgoingMessage);
+                ack?.({ ok: true, message: outgoingMessage });
+            } catch (error) {
+                console.error("Failed to save public chat message:", error);
+                socket.emit("public:error", { message: "Unable to send message" });
+                ack?.({ ok: false, error: "Unable to send message" });
+            }
+        });
 
-//             const room = getDmRoomName(userId, otherUserId);
-//             socket.join(room);
-//             socket.emit("dm:joined", { room });
-//         });
+        socket.on("disconnect", () => {
+            console.log(`Public chat disconnected: ${socket.id}`);
+        });
+    });
 
-//         socket.on("dm:message", (payload: { otherUserId?: string; message?: string }) => {
-//             const userId = socket.data.user?.userId;
-//             const otherUserId = payload?.otherUserId;
-//             const message = payload?.message?.trim();
+    return io;
+};
 
-//             if (!userId || !otherUserId || !message) {
-//                 return;
-//             }
+export const getSocketServer = () => {
+    if (!io) {
+        throw new Error("Socket server not initialized");
+    }
 
-//             const room = getDmRoomName(userId, otherUserId);
-//             io?.of("/dm").to(room).emit("dm:message", {
-//                 room,
-//                 message,
-//                 sender: socket.data.user,
-//                 createdAt: new Date().toISOString(),
-//             });
-//         });
-//     });
-
-//     return io;
-// };
-
-// export const getSocketServer = () => {
-//     if (!io) {
-//         throw new Error("Socket server not initialized");
-//     }
-
-//     return io;
-// };
-
-// export const emitBookingNotification = (payload: {
-//     rideId: string;
-//     rideOwnerId: string;
-//     bookerId: string;
-//     bookerName?: string;
-//     rideTitle?: string;
-// }) => {
-//     const socketServer = getSocketServer();
-//     const room = getDmRoomName(payload.rideOwnerId, payload.bookerId);
-
-//     socketServer.of("/dm").to(room).emit("booking:created", {
-//         ...payload,
-//         createdAt: new Date().toISOString(),
-//     });
-// };
-
-// export const emitServiceFeed = (room: "carpool" | "project" | "lost-found" | "car-rental", payload: {
-//     title: string;
-//     description?: string;
-//     actor?: TokenPayload;
-//     sourceId?: string;
-// }) => {
-//     const socketServer = getSocketServer();
-
-//     socketServer.of("/feeds").to(room).emit("feed:event", {
-//         room,
-//         ...payload,
-//         createdAt: new Date().toISOString(),
-//     });
-// };
+    return io;
+};
