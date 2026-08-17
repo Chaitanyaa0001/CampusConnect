@@ -160,7 +160,6 @@ export const initPrivateChatServer = (server: HttpServer) => {
                         });
                         return;
                     }
-
                     try {
                         const conversation =
                             await prisma.conversation.findUnique({
@@ -263,7 +262,6 @@ export const initPrivateChatServer = (server: HttpServer) => {
                             });
                             return;
                         }
-
                         const messages =
                             await prisma.privateMessage.findMany({
                                 where: {
@@ -274,7 +272,6 @@ export const initPrivateChatServer = (server: HttpServer) => {
                                 },
                                 take: PRIVATE_CHAT_HISTORY_LIMIT,
                             });
-
                         ack?.({
                             ok: true,
                             messages: messages
