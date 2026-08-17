@@ -1,26 +1,60 @@
-import { publishEvent } from "../events/publisher";
-import { ROUTING_KEY } from "../events/routingKey";
-import { ICreateRideInput } from "../interface/interface";
-import { prisma } from "../utils/prisma.client";
+import {uploadImage,deleteImage,} from "cloudinary-sdk";
+import {Express} from "express";
+import { prisma } from "../utils/prisma.client.js";
+importScriptsmport {Multer} from "multer";
+import { cloudinary } from "../config/cloudinary.config.js";
+import { env } from "../config/env.config.js";
+import {ICreateLostAndFoundInput,} from "../interface/interface.js";
 
-export const postRideService = async (data: ICreateRideInput, userId: string) => {
-    const ride = await prisma.ride.create({
-        data: {
-            userId,
-            fromLocation: data.fromLocation,
-            toLocation: data.toLocation,
-            departureAt: data.departureAt,
-            vehicleName: data.vehicleName,
-            price: data.price,
-            totalSeats: data.totalSeats,
-            bookedSeats: 0,
-            description: data.description,
-        },
-    });
-    await publishEvent(ROUTING_KEY.LOST_AND_FOUND_KEY, {
-            rideId: ride.id,
-            userId: ride.userId,
-        });
+export const postLostAndFoundService = async ( data: ICreateLostAndFoundInput,userId: string, file?: Express.Multer.File) => {
+    let uploadedImage:
+        | {
+            public_id: string;
+            secure_url: string;
+        }
+        | undefined;
+    // Upload image if provided
+    if (file) {
+        uploadedImage = await uploadImage(
+            cloudinary,
+            file.buffer,
+            env.CLOUDINARY_FOLDER_NAME
+        );
+    }
+    try {
+        const lostAndFound =
+            await prisma.lostAndFound.create({
+                data: {
+                    userId,
+                    itemName:
+                        data.itemName,
+                    type:
+                        data.type,
 
-    return ride;
+                    location:
+                        data.location,
+                    date:
+                        new Date(data.date),
+                    description:
+                        data.description,
+                    tags:
+                        data.tags,
+                    imagePublicId:
+                        uploadedImage?.public_id,
+                    imageUrl:
+                        uploadedImage?.secure_url,
+                },
+            });
+        return lostAndFound;
+    } catch (error) {
+        // If DB creation fails,
+        // remove uploaded image from Cloudinary
+        if (uploadedImage) {
+            await deleteImage(
+                cloudinary,
+                uploadedImage.public_id
+            );
+        }
+        throw error;
+    }
 };

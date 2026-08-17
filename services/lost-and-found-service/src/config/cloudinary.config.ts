@@ -1,11 +1,8 @@
-import { v2 as cloudinary } from 'cloudinary';
+import { createCloudinaryClient } from "cloudinary-sdk";
 import { env } from "./env.config.js";
-cloudinary.config({
-    cloud_name:env.CLOUDINARY_CLOUD_NAME,
-    api_key:env.CLOUDINARY_API_KEY,
-    api_secret: env.CLOUDINARY_API_SECRET,
-    secure: true,
+
+export const cloudinary = createCloudinaryClient({
+    cloudName: env.CLOUDINARY_CLOUD_NAME,
+    apiKey: env.CLOUDINARY_API_KEY,
+    apiSecret: env.CLOUDINARY_API_SECRET,
 });
-
-
-export default cloudinary;
