@@ -6,23 +6,30 @@
   "types": "./dist/index.d.ts",
   "type": "module",
   "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    },
-    "./config": {
-      "import": "./dist/config/auth.config.js",
-      "types": "./dist/config/auth.config.d.ts"
-    },
-    "./middleware": {
-      "import": "./dist/middleware/authenticate.js",
-      "types": "./dist/middleware/authenticate.d.ts"
-    },
-    "./types": {
-      "import": "./dist/types/tokenpayload.js",
-      "types": "./dist/types/tokenpayload.d.ts"
-    }
+  ".": {
+    "types": "./dist/index.d.ts",
+    "import": "./dist/index.js"
   },
+  "./types/express": {
+    "types": "./dist/types/express.d.ts"
+  },
+  "./config": {
+    "import": "./dist/config/auth.config.js",
+    "types": "./dist/config/auth.config.d.ts"
+  },
+  "./middleware": {
+    "import": "./dist/middleware/authenticate.js",
+    "types": "./dist/middleware/authenticate.d.ts"
+  },
+  "./socket": {
+    "import": "./dist/middleware/authenticate-socket.js",
+    "types": "./dist/middleware/authenticate-socket.d.ts"
+  },
+  "./types": {
+    "import": "./dist/types/tokenpayload.js",
+    "types": "./dist/types/tokenpayload.d.ts"
+  }
+},
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",

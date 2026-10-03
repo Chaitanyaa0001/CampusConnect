@@ -1,0 +1,29 @@
+import { start } from 'node:repl';
+
+import { env } from './config/env.config.js';
+import { connectRabbitMQ } from './lib/rabbitMq.js';
+import { startConsumers } from './events/index.js';
+import { prisma } from './lib/prisma.js';
+import app from './app.js';
+
+
+
+async function startServer() {
+  try {
+    await prisma.$connect();
+    console.log("Connected to the database successfully.");
+
+    await connectRabbitMQ();  // Wait for RabbitMQ
+    await startConsumers();
+
+    app.listen(env.PORT, () => {
+      console.log(`User  service running on port  ${env.PORT}`);
+    });
+    
+  } catch (error) {
+    console.error("Failed to start:", error);
+    process.exit(1);
+  }
+} 
+
+startServer();

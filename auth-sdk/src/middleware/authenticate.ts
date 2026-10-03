@@ -29,7 +29,16 @@ export function authenticate(req: Request,res: Response,next: NextFunction) {
                     message: "Invalid or expired token"
                 });
             }
-            req.user = decoded as TokenPayload;
+            const payload = decoded as TokenPayload;
+
+            if (payload.type !== "access") {
+                return res.status(401).json({
+                    success: false,
+                    message: "Invalid access token"
+                });
+            }
+
+            req.user = payload;
             next();
         }
     );
