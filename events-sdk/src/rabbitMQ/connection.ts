@@ -3,6 +3,13 @@ import type { ConfirmChannel } from "amqplib";
 
 import { EXCHANGE } from "../config/exchange.js";
 
+// events-sdk/src/rabbitMQ/connection.ts
+// Add right after `channel = await connection.createConfirmChannel();`
+//
+// Today only the CONNECTION is watched. If just the channel dies (for example a queue declared
+// with different arguments, or a double ack, which RabbitMQ answers by closing the channel),
+// the connection stays open and the service keeps running with nothing consuming or publishing.
+
 let connection: amqp.ChannelModel | undefined;
 let channel: ConfirmChannel | undefined;
 let closing = false;
@@ -17,21 +24,10 @@ export const getChannel = (): ConfirmChannel => {
   return channel;
 };
 
-export const connectRabbitMQ = async (
-  url: string,
-  options: {
-    retries?: number;
-    delayMs?: number;
-  } = {}
-): Promise<ConfirmChannel> => {
-  const {
-    retries = 10,
-    delayMs = 3000,
-  } = options;
-
+export const connectRabbitMQ = async (url: string,options: {retries?: number;delayMs?: number;} = {}): Promise<ConfirmChannel> => {
+  const {retries = 10,delayMs = 3000,} = options;
   for (
-    let attempt = 1;
-    ;
+    let attempt = 1;;
     attempt++
   ) {
     try {
@@ -60,8 +56,17 @@ export const connectRabbitMQ = async (
         }
       );
 
-      channel =
-        await connection.createConfirmChannel();
+      channel =  await connection.createConfirmChannel();
+
+        channel.on("error", (error) => {
+            console.error("[rabbitmq] channel error", error);
+        });
+
+        channel.on("close", () => {
+          if (closing) return;
+          console.error("[rabbitmq] channel closed unexpectedly");
+          process.exit(1);
+        });
 
       await channel.assertExchange(
         EXCHANGE.EVENTS,
