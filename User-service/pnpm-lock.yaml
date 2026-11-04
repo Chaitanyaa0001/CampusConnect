@@ -25,7 +25,7 @@ importers:
         version: 2.0.1
       auth-sdk:
         specifier: file:../auth-sdk
-        version: file:../auth-sdk
+        version: file:../auth-sdk(express@5.2.1)
       cloudinary:
         specifier: ^2.10.0
         version: 2.10.0
@@ -383,6 +383,8 @@ packages:
 
   auth-sdk@file:../auth-sdk:
     resolution: {directory: ../auth-sdk, type: directory}
+    peerDependencies:
+      express: '>=4'
 
   aws-ssl-profiles@1.1.2:
     resolution: {integrity: sha512-NZKeq9AfyQvEeNlN0zSYAaWrmBffJh3IELMZfRpJVWgrpEbtEpnjvzqBPf+mxoI287JohRDoa+/nsfqqiZmF6g==}
@@ -1611,11 +1613,8 @@ snapshots:
 
   arg@4.1.3: {}
 
-  auth-sdk@file:../auth-sdk:
+  auth-sdk@file:../auth-sdk(express@5.2.1):
     dependencies:
-      '@types/express': 5.0.6
-      '@types/jsonwebtoken': 9.0.10
-      dotenv: 17.4.2
       express: 5.2.1
       jsonwebtoken: 9.0.3
       jwks-rsa: 4.1.0
