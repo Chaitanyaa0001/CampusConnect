@@ -12,7 +12,7 @@ async function startServer() {
     await prisma.$connect();
     console.log("Connected to the database successfully.");
     await connectRabbitMQ(env.RABBITMQ_URL);
-    await startConsumer();    await startConsumer();     // Wait for consumer to start
+    await startConsumer();        // Wait for consumer to start
     
     app.listen(env.PORT, () => {
       console.log(`Auth service running on port  ${env.PORT}`);

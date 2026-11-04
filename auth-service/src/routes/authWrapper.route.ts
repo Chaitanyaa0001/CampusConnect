@@ -4,7 +4,8 @@ import signupRoute from "./signup.route";
 import signinRoute from "./signin.route";
 import logoutRoute from "./logout.route";
 import refreshRoute from "./refresh.route";
-import { verifyEmailController } from "../controllers/verifyEmail.controller";
+import verifyEmailRoute from "./verifyEmailController.route";
+import resendVerificationRoute from "./resend-verification.route";
 
 const router = Router();
 
@@ -12,6 +13,7 @@ router.use(signupRoute);
 router.use(signinRoute);
 router.use(logoutRoute);
 router.use(refreshRoute);
-router.get("/verify-email", verifyEmailController);
+router.use(verifyEmailRoute);
+router.use(resendVerificationRoute);
 
 export default router;

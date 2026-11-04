@@ -1,17 +1,12 @@
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 
-export const hashPassword = async (password: string) => {
-  return bcrypt.hash(password, 10);
-};
+export const hashPassword = (password: string) => bcrypt.hash(password, 12);
+export const comparePassword = (password: string, hash: string) => bcrypt.compare(password, hash);
 
-export const hashToken = async (token : string) =>{
-  return crypto.createHash("sha256").update(token).digest("hex");
-}
+// sync is enough, there's no I/O
+export const hashToken = (token: string) =>
+  crypto.createHash("sha256").update(token).digest("hex");
 
-export const comparePassword = async (
-  password: string,
-  hash: string
-) => {
-  return bcrypt.compare(password, hash);
-};
+// used so "user not found" costs the same time as "wrong password"
+export const DUMMY_HASH = bcrypt.hashSync("dummy-password-for-timing", 12);

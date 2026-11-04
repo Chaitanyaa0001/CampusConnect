@@ -1,17 +1,13 @@
-import { catchAsync } from "../error/tryCatchAsync";
 import { Request, Response } from "express";
+import { catchAsync } from "../error/tryCatchAsync";
 import { signinService } from "../services/SignIn.service";
-export const signinController  = catchAsync(async (req:Request, res:Response)=>{
-    const { email, password,username } = req.body;
-    // extract tokens from sign in service 
-    const { user, accessToken, refreshToken } = await signinService(email,password);
+import { REFRESH_COOKIE, refreshCookieOptions, REFRESH_MAX_AGE } from "../config/cookie";
 
-    res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
-    
-    return res.status(200).json({ message: "Login successful", accessToken});
-})
+export const signinController = catchAsync(async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  const { accessToken, refreshToken } = await signinService(email, password);
+  res.cookie(REFRESH_COOKIE, refreshToken, {
+    ...refreshCookieOptions, 
+    maxAge: REFRESH_MAX_AGE });
+    return res.status(200).json({ message: "Login successful", accessToken });
+});
