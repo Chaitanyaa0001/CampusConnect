@@ -1,35 +1,35 @@
 {
   "name": "auth-sdk",
-  "version": "1.0.0",
-  "description": "Authentication SDK for  microservices",
+  "version": "1.1.0",
+  "description": "Authentication SDK for microservices",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "type": "module",
   "exports": {
-  ".": {
-    "types": "./dist/index.d.ts",
-    "import": "./dist/index.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./types/express": {
+      "types": "./dist/types/express.d.ts"
+    },
+    "./config": {
+      "import": "./dist/config/auth.config.js",
+      "types": "./dist/config/auth.config.d.ts"
+    },
+    "./middleware": {
+      "import": "./dist/middleware/authenticate.js",
+      "types": "./dist/middleware/authenticate.d.ts"
+    },
+    "./socket": {
+      "import": "./dist/middleware/authenticate-socket.js",
+      "types": "./dist/middleware/authenticate-socket.d.ts"
+    },
+    "./types": {
+      "import": "./dist/types/tokenpayload.js",
+      "types": "./dist/types/tokenpayload.d.ts"
+    }
   },
-  "./types/express": {
-    "types": "./dist/types/express.d.ts"
-  },
-  "./config": {
-    "import": "./dist/config/auth.config.js",
-    "types": "./dist/config/auth.config.d.ts"
-  },
-  "./middleware": {
-    "import": "./dist/middleware/authenticate.js",
-    "types": "./dist/middleware/authenticate.d.ts"
-  },
-  "./socket": {
-    "import": "./dist/middleware/authenticate-socket.js",
-    "types": "./dist/middleware/authenticate-socket.d.ts"
-  },
-  "./types": {
-    "import": "./dist/types/tokenpayload.js",
-    "types": "./dist/types/tokenpayload.d.ts"
-  }
-},
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
@@ -41,14 +41,17 @@
   "license": "MIT",
   "files": ["dist"],
   "dependencies": {
-    "@types/express": "^5.0.6",
-    "@types/jsonwebtoken": "^9.0.10",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "jwks-rsa": "^4.1.0"
   },
+  "peerDependencies": {
+    "express": ">=4"
+  },
   "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^22.0.0",
+    "express": "^5.2.1",
     "typescript": "^5.0.0"
   },
   "publishConfig": {

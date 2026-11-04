@@ -1,9 +1,8 @@
 export interface TokenPayload {
-    userId: string;
-    email: string;
-    username: string;
-    type: "access" | "refresh";
-    iat?: number;
-    exp?: number;
-
+  userId: string;
+  email: string;
+  username: string;
+  type: "access"; // the SDK only ever accepts access tokens
+  iat?: number;
+  exp?: number;
 }

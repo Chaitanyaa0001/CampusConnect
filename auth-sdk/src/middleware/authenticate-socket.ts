@@ -1,69 +1,42 @@
-import jwt from "jsonwebtoken";
-
-import { AUTH_CONFIG } from "../config/auth.config.js";
-import { getKey } from "../jwks/client.js";
+import { verifyAccessToken } from "../jwt/verify.js";
 import { TokenPayload } from "../types/tokenpayload.js";
 
 type SocketLike = {
-    handshake: {
-        auth?: {
-            token?: unknown;
-        };
-        headers: {
-            authorization?: string;
-        };
-    };
-    data: {
-        user?: TokenPayload;
-    };
+  handshake: {
+    auth?: { token?: unknown };
+    headers: { authorization?: string };
+  };
+  data: { user?: TokenPayload };
 };
 
 const getSocketToken = (socket: SocketLike) => {
-    const authToken = socket.handshake.auth?.token;
-    const authHeader = socket.handshake.headers.authorization;
-
-    if (typeof authToken === "string") {
-        return authToken;
-    }
-
-    if (authHeader?.startsWith("Bearer ")) {
-        return authHeader.slice("Bearer ".length);
-    }
-
-    return undefined;
+  const authToken = socket.handshake.auth?.token;
+  const authHeader = socket.handshake.headers.authorization;
+  if (typeof authToken === "string") return authToken;
+  if (authHeader?.startsWith("Bearer ")) return authHeader.slice(7).trim();
+  return undefined;
 };
 
-export function authenticateSocket(socket: SocketLike, next: (error?: Error) => void) {
-    const token = getSocketToken(socket);
+export async function authenticateSocket(socket: SocketLike, next: (error?: Error) => void) {
+  const token = getSocketToken(socket);
+  if (!token) return next(new Error("Unauthorized"));
+  try {
+    socket.data.user = await verifyAccessToken(token);
+    next();
+  } catch (err) {
+    // message carries the code so the client can tell "expired" from "invalid"
+    next(new Error((err as { code?: string }).code ?? "TOKEN_INVALID"));
+  }
+}
 
-    if (!token) {
-        next(new Error("Unauthorized"));
-        return;
-    }
-
-    jwt.verify(
-        token,
-        getKey,
-        {
-            algorithms: ["RS256"],
-            issuer: AUTH_CONFIG.issuer,
-            audience: AUTH_CONFIG.audience,
-        },
-        (err, decoded) => {
-            if (err) {
-                next(new Error("Invalid or expired token"));
-                return;
-            }
-
-            const payload = decoded as TokenPayload;
-
-            if (payload.type !== "access") {
-                next(new Error("Invalid access token"));
-                return;
-            }
-
-            socket.data.user = payload;
-            next();
-        },
-    );
+// Call inside io.on("connection"): drops the socket when its access token expires.
+export function disconnectOnExpiry(socket: {
+  data: { user?: TokenPayload };
+  disconnect: (close?: boolean) => unknown;
+  on: (event: "disconnect", cb: () => void) => unknown;
+}) {
+  const exp = socket.data.user?.exp;
+  if (!exp) return;
+  const timer = setTimeout(() => socket.disconnect(true), Math.max(exp * 1000 - Date.now(), 0));
+  socket.on("disconnect", () => clearTimeout(timer));
 }
