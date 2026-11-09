@@ -1,62 +1,37 @@
 import { prisma } from "../lib/prisma";
 import { AppError } from "../error/AppError";
 import { hashToken } from "../utils/hashPass";
-import { verifyRefreshToken } from "../utils/generateToken";
-import {
-  generateAccessToken,
-  generateRefreshToken,
-} from "../utils/generateToken";
+import { verifyRefreshToken, generateAccessToken, generateRefreshToken } from "../utils/generateToken";
 
-export const refreshTokenService = async (refreshToken: string) => {
-  //  verify refresh token (cokkie se jo token aya usko verify )
-  const payload = verifyRefreshToken(refreshToken);
+export const refreshTokenService = async (token: string) => {
+  const payload = verifyRefreshToken(token);
+  const hashed = hashToken(token);
 
-  //  databse ka token hash se match krna hoga (jo token aya usko hash krke database me stored hash se compare krna hoga)
-  const hashed = await hashToken(refreshToken);
-
-  //  find session and compare token hash and check expiry
-  const session = await prisma.session.findFirst({
-    where: {
-      userId: payload.userId,
-      tokenHash: hashed,
-      expiresAt: {
-        gt: new Date(),
-      },
-    },
+  // atomic: only ONE concurrent request can delete the row (count === 1)
+  const { count } = await prisma.session.deleteMany({
+    where: { userId: payload.userId, tokenHash: hashed, expiresAt: { gt: new Date() } },
   });
 
-  if (!session) {
-    throw new AppError("Invalid session", 401);
+  if (count === 0) {
+    // valid signature but no session => token already rotated or revoked.
+    // Treat as possible theft: kill every session of this user.
+    await prisma.session.deleteMany({ where: { userId: payload.userId } });
+    throw new AppError("Session invalid, please login again", 401);
   }
 
-  //  delete old session (rotation)
-  await prisma.session.delete({
-    where: { id: session.id },
-  });
+  // fresh data from DB, not from the old token
+  const user = await prisma.user.findUnique({ where: { id: payload.userId } });
+  if (!user || !user.isVerified) throw new AppError("Invalid session", 401);
 
-  //  generate new tokens
-  const newAccessToken = generateAccessToken({
-    userId: payload.userId,
-    email: payload.email,
-    username: payload.username
-  });
+  const accessToken = generateAccessToken({ userId: user.id, email: user.email, username: user.username });
+  const refreshToken = generateRefreshToken({ userId: user.id });
 
-  const newRefreshToken = generateRefreshToken({
-    userId: payload.userId,
-    email: payload.email,
-    username: payload.username
-  });
-
-  //  store new refresh token
-  const newHash = await hashToken(newRefreshToken);
-  
   await prisma.session.create({
     data: {
-      userId: payload.userId,
-      tokenHash: newHash,
+      userId: user.id,
+      tokenHash: hashToken(refreshToken),
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     },
   });
-
-  return {accessToken: newAccessToken,refreshToken: newRefreshToken,};
+  return { accessToken, refreshToken };
 };

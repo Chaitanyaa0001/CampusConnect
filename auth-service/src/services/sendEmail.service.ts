@@ -2,7 +2,18 @@ import { brevoClient } from "../lib/brevo.client";
 import { env } from "../config/env.config";
 
 export const sendEmailService = async (toEmail: string,token: string) => {
-  const url = `${env.CLIENT_URL}/verify-email?token=${token}`;
+  // Add at the very top of sendEmailService in services/sendEmail.service.ts, after `const url = ...`.
+// For load tests: no real Brevo call (quota, real emails), and the link is logged instead.
+const url = `${env.CLIENT_URL}/verify-email?token=${token}`;
+
+if (process.env.MAIL_DRY_RUN === "true") {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("MAIL_DRY_RUN must not be set in production");
+  }
+  console.log(`[mail:dry-run] ${toEmail} -> ${url}`);
+  return { dryRun: true };
+}
+// =========================================================================
 
   const result =
     await brevoClient.transactionalEmails.sendTransacEmail({
