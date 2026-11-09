@@ -1,15 +1,21 @@
-import express from 'express';
-import dotenv from 'dotenv';
-
+import dotenv from "dotenv";
 dotenv.config();
 
+const required = (key: string) => {
+  const v = process.env[key];
+  if (!v) throw new Error(`Missing ${key} environment variable`);
+  return v;
+};
+
 export const env = {
-    PORT: Number(process.env.PORT) || 3000,
-    DATABASE_URL: (process.env.DATABASE_URL)?? (() => { throw new Error("Missing Postgress URL environment variable") })(),
-    RABBITMQ_URL : (process.env.RABBITMQ_URL) ?? (() => { throw new Error("Missing RABBITMQ_URL environment variable") })(),
-    // cloudinary 
-    CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME ?? (() => { throw new Error("Missing CLOUDINARY_CLOUD_NAME environment variable") })(),
-    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY ?? (() => { throw new Error("Missing CLOUDINARY_API_KEY environment variable") })(),
-    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET ?? (() => { throw new Error("Missing CLOUDINARY_API_SECRET environment variable") })(),
-    CLOUDINARY_FOLDER: process.env.CLOUDINARY_FOLDER ?? "campusconnect/profiles",
-} 
+  PORT: Number(process.env.PORT) || 3000,
+  NODE_ENV: process.env.NODE_ENV ?? "development",
+  DATABASE_URL: required("DATABASE_URL"),
+  RABBITMQ_URL: required("RABBITMQ_URL"),
+  CLIENT_URL: required("CLIENT_URL"), // used for CORS, no trailing slash
+  // cloudinary
+  CLOUDINARY_CLOUD_NAME: required("CLOUDINARY_CLOUD_NAME"),
+  CLOUDINARY_API_KEY: required("CLOUDINARY_API_KEY"),
+  CLOUDINARY_API_SECRET: required("CLOUDINARY_API_SECRET"),
+  CLOUDINARY_FOLDER: process.env.CLOUDINARY_FOLDER ,
+};

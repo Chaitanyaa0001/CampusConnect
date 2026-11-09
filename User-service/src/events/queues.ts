@@ -8,4 +8,4 @@ export const QUEUES = {
   USER_CARPOOL_DLQ: "user.carpool.dlq",
   USER_PROJECTS_DLQ: "user.projects.dlq",
   USER_LOST_FOUND_DLQ: "user.lost_found.dlq",
-};
+} as const;

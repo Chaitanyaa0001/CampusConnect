@@ -3,13 +3,9 @@ export interface UserEmailVerifiedEvent {
   email: string;
   username: string;
 }
-export interface ProjectCreatedEvent {
-  userId: string;
-}   
-export interface LostFoundCreatedEvent {
-  userId: string;
-}
 
-export interface CarpoolCreatedEvent {
+// carpool / project / lost-and-found / car-rental created and deleted events
+export interface OwnedEvent {
   userId: string;
+  entityId?: string;
 }

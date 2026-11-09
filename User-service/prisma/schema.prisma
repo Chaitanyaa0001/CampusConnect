@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -13,19 +8,29 @@ datasource db {
 }
 
 model User {
-  // Primary Identity (same ID as Auth Service)
-  id          String   @id
+  // Primary identity (same ID as Auth Service)
+  id       String  @id
   // Read model (owned by Auth Service, synchronized via events)
-  username String @unique
-  email    String @unique
-  bio      String?  @db.VarChar(250)
-  profileImagePublicId String? // image ki id jisse delete hoga updation ke time 
-  profileImageUrl      String?  // image ka url jisse frontend pe show hoga
+  username String  @unique
+  email    String  @unique
+  bio      String? @db.VarChar(250)
+  profileImagePublicId String? // Cloudinary id (internal, never returned to clients)
+  profileImageUrl      String? // shown by the frontend
+
   // Statistics (maintained through events)
-  carpoolCount     Int @default(0)
-  carRentalCount   Int @default(0)
-  projectCount     Int @default(0)
-  lostFoundCount   Int @default(0)
+  carpoolCount   Int @default(0)
+  projectCount   Int @default(0)
+  lostFoundCount Int @default(0)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// NEW: remembers which events were already applied, so a redelivered event
+// (at-least-once delivery) cannot increment a counter twice.
+model ProcessedEvent {
+  eventId   String   @id
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
 }
