@@ -3,12 +3,7 @@ import { CloudinaryError } from "../error/error.js";
 import type { CloudinaryClient, CloudinaryImage, UploadImageOptions } from "../types/type.js";
 
 /** Upload an image. Pass `publicId` to make it replace the previous one for that owner. */
-export const uploadImage = (
-  client: CloudinaryClient,
-  data: Uint8Array,
-  folder: string,
-  options: UploadImageOptions = {}
-): Promise<CloudinaryImage> =>
+export const uploadImage = (client: CloudinaryClient,data: Uint8Array,folder: string,options: UploadImageOptions = {}): Promise<CloudinaryImage> =>
   new Promise((resolve, reject) => {
     const {
       publicId,
@@ -18,6 +13,9 @@ export const uploadImage = (
       timeoutMs = 20_000,
     } = options;
 
+    if (!data || data.length === 0) {
+        throw new CloudinaryError("Image buffer cannot be empty");
+    }
     const stream = client.uploader.upload_stream(
       {
         folder,
