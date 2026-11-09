@@ -1,15 +1,18 @@
-# override 
 services:
   rabbit-mq:
-    image: rabbitmq:3.8-management
+    image: rabbitmq:3-management
     container_name: campus-rabbitmq
     ports:
-      - "5672:5672"     # app connection
-      - "15672:15672"   # UI dashboard
+      - "5672:5672"
+      - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
   postgres:
     image: postgres:15
     container_name: campus-postgres
@@ -20,59 +23,44 @@ services:
       POSTGRES_PASSWORD: Chaitanya@123
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped 
-
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U Chaitanya -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
   auth-service:
-    build: ./services/auth-service
-    ports:
-      - "3000:3000"
-    env_file:
-    - ./services/auth-service/.env
-    environment:  
-      NODE_ENV: development
-    volumes:
-      - ./services/auth-service:/app   
-      - /app/node_modules
-    command: pnpm run dev 
-    depends_on:
-    #   - rabbit-mq
-      # - redis
-      - postgres
-    restart: unless-stopped
-
-  user-service:
-    build: ./services/user-service
-    ports:
-      - "3001:3001"
-    env_file:
-      - ./services/User-service/.env  
+    build:
+      dockerfile: Dockerfile            # your dev Dockerfile
     environment:
       NODE_ENV: development
-    volumes:  
+      DATABASE_URL: postgresql://Chaitanya:Chaitanya%40123@postgres:5432/authdb
+      RABBITMQ_URL: amqp://guest:guest@rabbit-mq:5672
+    volumes:
+      - ./services/auth-service:/app
+      - /app/node_modules
+    command: sh -c "pnpm prisma generate && pnpm run dev"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbit-mq:
+        condition: service_healthy
+  user-service:
+    build:
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://Chaitanya:Chaitanya%40123@postgres:5432/userdb
+      RABBITMQ_URL: amqp://guest:guest@rabbit-mq:5672
+    volumes:
       - ./services/user-service:/app
       - /app/node_modules
-    command : pnpm run dev   
+    command: sh -c "pnpm prisma generate && pnpm run dev"
     depends_on:
-      # - rabbit-mq
-      - postgres
-    restart: unless-stopped  
-
-    carpool-service :
-      build: ./services/carpool-service
-      ports:
-        - "3002:3002"
-      env_file:
-        - ./services/carpool-service/.env
-      environment:
-        NODE_ENV: development 
-      volumes:
-        - ./services/carpool-service:/app
-        - /app/node_modules
-      command: pnpm run dev
-      depends_on:
-          - postgres
-      restart: unless-stopped
-    
+      postgres:
+        condition: service_healthy
+      rabbit-mq:
+        condition: service_healthy
+        
 volumes:
   postgres_data:
-
