@@ -44,3 +44,8 @@ export { Prisma }
  * 
  */
 export type Ride = Prisma.RideModel
+/**
+ * Model OutboxEvent
+ * 
+ */
+export type OutboxEvent = Prisma.OutboxEventModel

@@ -1,26 +1,18 @@
-import { prisma } from "../utils/prisma.client";
+import { prisma } from "../utils/prisma.client.js";
+import { rideSelect } from "../interface/interface.js";
+import type { MyRidesQuery } from "../validator/validator.js";
 
-export const getCarpoolByMeService = async (userId: string,page = 1,limit = 10,) => {
-	const skip = (page - 1) * limit;
+// my rides (profile page tab): cursor pagination
+export const getMyRidesService = async (userId: string, { limit, cursor }: MyRidesQuery) => {
+  const rows = await prisma.ride.findMany({
+    where: { userId },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    take: limit + 1, // one extra row tells us whether there is a next page
+    ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+    select: rideSelect,
+  });
 
-	const [total, rides] = await prisma.$transaction([
-		prisma.ride.count({
-			where: {
-				userId,
-			},
-		}),
-		prisma.ride.findMany({
-			where: {
-				userId,
-			},
-			skip,
-			take: limit,
-			orderBy: {
-				createdAt: "desc",
-			},
-		}),
-	]);
-
-	return {rides,pagination: {total,page,limit,totalPages: Math.ceil(total / limit),hasNext: page * limit < total,hasPrev: page > 1,},
-	};
+  const hasMore = rows.length > limit;
+  const items = hasMore ? rows.slice(0, limit) : rows;
+  return { items, nextCursor: hasMore ? items[items.length - 1].id : null };
 };

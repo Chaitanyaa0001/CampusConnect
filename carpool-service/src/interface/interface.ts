@@ -29,3 +29,22 @@ export interface IPaginationResponse<T> {
     hasPrev: boolean;
   };
 }
+
+import type { Prisma } from "../generated/prisma/client";
+
+// what a ride card needs: never `select` more than the client should see.
+// Shared by every ride service so the response shape is defined in ONE place.
+export const rideSelect = {
+  id: true,
+  userId: true,
+  fromLocation: true,
+  toLocation: true,
+  departureAt: true,
+  vehicleName: true,
+  price: true,
+  totalSeats: true,
+  bookedSeats: true,
+  description: true,
+  status: true,
+  createdAt: true,
+} satisfies Prisma.RideSelect;

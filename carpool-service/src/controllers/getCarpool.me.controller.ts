@@ -1,23 +1,13 @@
 import { Request, Response } from "express";
+import { requireUser } from "auth-sdk";
+import { catchAsync } from "../error/tryCatchAsync.js";
+import { getValid } from "../validator/validator.js";
+import type { MyRidesQuery } from "../validator/validator.js";
+import { getMyRidesService } from "../services/getRidebyme.service.js";
 
-import { AppError } from "../error/AppError";
-import { catchAsync } from "../error/tryCatchAsync";
-import { getCarpoolByMeService } from "../services/getRidebyme.service";
-
-export const getcarpoolbyme = catchAsync(async (req: Request, res: Response) => {
-	const userId = req.user?.userId;
-
-	if (!userId) {
-		throw new AppError("User not authenticated", 401);
-	}
-
-	const page = Number(req.query.page) || 1;
-	const limit = Number(req.query.limit) || 10;
-
-	const rides = await getCarpoolByMeService(userId, page, limit);
-
-	return res.status(200).json({
-		success: true,
-		data: rides,
-	});
+// userId comes from the verified token, so a user can only ever list their own rides.
+export const getMyRidesController = catchAsync(async (req: Request, res: Response) => {
+  const { userId } = requireUser(req);
+  const result = await getMyRidesService(userId, getValid<MyRidesQuery>(res, "query"));
+  return res.status(200).json({ success: true, data: result.items, nextCursor: result.nextCursor });
 });

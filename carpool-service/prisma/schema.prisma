@@ -10,23 +10,23 @@ datasource db {
 }
 
 model Ride {
-  id             String      @id @default(cuid())
-  userId         String
-  fromLocation   String
-  toLocation     String
-  departureAt    DateTime
-  vehicleName    String?
-  price          Int
-  totalSeats     Int
-  bookedSeats    Int         @default(0)
-  description    String?
-  status         RideStatus  @default(OPEN)
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-  
+  id           String     @id @default(cuid())
+  userId       String
+  fromLocation String
+  toLocation   String
+  departureAt  DateTime
+  vehicleName  String?
+  price        Int
+  totalSeats   Int
+  bookedSeats  Int        @default(0)
+  description  String?
+  status       RideStatus @default(OPEN)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([userId, createdAt]) // GET /me
+  @@index([status, departureAt]) // GET / (open rides, soonest first)
 }
-
-
 
 enum RideStatus {
   OPEN
@@ -34,3 +34,16 @@ enum RideStatus {
   CANCELLED
 }
 
+// Written in the SAME transaction as the ride, then published to RabbitMQ by outbox/relay.ts.
+// A ride can never exist without its event, and RabbitMQ being down cannot lose it.
+model OutboxEvent {
+  id          String    @id @default(uuid())
+  routingKey  String
+  payload     Json
+  attempts    Int       @default(0)
+  lastError   String?
+  createdAt   DateTime  @default(now())
+  publishedAt DateTime?
+
+  @@index([publishedAt, createdAt])
+}

@@ -1,19 +1,11 @@
-import {Request, Response} from "express";
-import { AppError } from "../error/AppError";
-import { catchAsync } from "../error/tryCatchAsync";
-import { getRideByIdService } from "../services/getRidebyId.service";
+import { Request, Response } from "express";
+import { catchAsync } from "../error/tryCatchAsync.js";
+import { getValid } from "../validator/validator.js";
+import type { IdParam } from "../validator/validator.js";
+import { getRideByIdService } from "../services/getRidebyId.service.js";
 
-export const getCarpoolbyIdController = catchAsync(async (req: Request, res: Response) => {
-    const carpoolId= req.params.id as string;
-    
-    if (!carpoolId) {
-        throw new AppError("Carpool ID is required", 400);
-    }
-    // Assuming you have a service function to get carpool by ID
-    const carpool = await getRideByIdService(carpoolId);
-    if (!carpool) {
-        throw new AppError("Carpool not found", 404);
-    }
-    return res.status(200).json({ success: true, data: carpool });
+export const getRideByIdController = catchAsync(async (_req: Request, res: Response) => {
+  const { id } = getValid<IdParam>(res, "params");
+  const ride = await getRideByIdService(id);
+  return res.status(200).json({ success: true, data: ride });
 });
-

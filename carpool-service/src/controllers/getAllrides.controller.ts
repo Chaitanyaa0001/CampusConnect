@@ -1,26 +1,10 @@
-import 'auth-sdk';
 import { Request, Response } from "express";
 import { catchAsync } from "../error/tryCatchAsync.js";
-import { getAllRidesService } from "../services/getAllrides.service.js";
-import { AppError } from "../error/AppError.js";
+import { getValid } from "../validator/validator.js";
+import type { ListRidesQuery } from "../validator/validator.js";
+import { listRidesService } from "../services/listrides.service.js";
 
-
-export const getAllRidesController = catchAsync(async (req: Request, res: Response) => {
-    const user = req.user;
-    if(!user){
-        throw  new AppError("User not authenticated", 401);
-    }
-        const rides = await getAllRidesService({
-            from: req.query.from as string,
-            to: req.query.to as string,
-            date: req.query.date as string,
-            page: Number(req.query.page) || 1,
-            limit: Number(req.query.limit) || 10,
-        });
-
-        return res.status(200).json({
-            success: true,
-            data: rides,
-        });
-    }
-);
+export const listRidesController = catchAsync(async (_req: Request, res: Response) => {
+  const result = await listRidesService(getValid<ListRidesQuery>(res, "query"));
+  return res.status(200).json({ success: true, data: result });
+});

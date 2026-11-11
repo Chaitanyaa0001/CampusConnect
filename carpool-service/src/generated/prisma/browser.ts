@@ -22,3 +22,8 @@ export * from './enums';
  * 
  */
 export type Ride = Prisma.RideModel
+/**
+ * Model OutboxEvent
+ * 
+ */
+export type OutboxEvent = Prisma.OutboxEventModel

@@ -9,4 +9,5 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/Ride'
+export type * from './models/OutboxEvent'
 export type * from './commonInputTypes'
