@@ -1,15 +1,27 @@
 FROM node:22-alpine
 
+RUN apk add --no-cache openssl && npm install -g pnpm@10.33.0
+
 WORKDIR /app
 
-RUN apk add --no-cache openssl && npm install -g pnpm
+# 1. SDKs (build each one before the service uses it)
+COPY auth-sdk ./auth-sdk
+COPY events-sdk ./events-sdk
+COPY cloudinary-sdk ./cloudinary-sdk
+RUN cd auth-sdk && pnpm install && pnpm run build
+RUN cd events-sdk && pnpm install && pnpm run build
+RUN cd cloudinary-sdk && pnpm install && pnpm run build
 
-COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml* ./
-
+# 2. Service deps
+WORKDIR /app/auth-service
+COPY auth-service/package.json auth-service/pnpm-lock.yaml* auth-service/pnpm-workspace.yaml* ./
+COPY auth-service/prisma ./prisma
 RUN pnpm install --frozen-lockfile
 
-COPY . .
+# 3. Service source
+COPY auth-service ./
+ARG DATABASE_URL="postgresql://build:build@localhost:5432/build"
+RUN pnpm prisma generate && pnpm run build
 
 EXPOSE 3000
-
-CMD ["pnpm", "run", "dev"]
+CMD ["node", "dist/index.js"]
