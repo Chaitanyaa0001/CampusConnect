@@ -8,26 +8,26 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./types/express": {
       "types": "./dist/types/express.d.ts"
     },
     "./config": {
-      "import": "./dist/config/auth.config.js",
-      "types": "./dist/config/auth.config.d.ts"
+      "types": "./dist/config/auth.config.d.ts",
+      "default": "./dist/config/auth.config.js"
     },
     "./middleware": {
-      "import": "./dist/middleware/authenticate.js",
-      "types": "./dist/middleware/authenticate.d.ts"
+      "types": "./dist/middleware/authenticate.d.ts",
+      "default": "./dist/middleware/authenticate.js"
     },
     "./socket": {
-      "import": "./dist/middleware/authenticate-socket.js",
-      "types": "./dist/middleware/authenticate-socket.d.ts"
+      "types": "./dist/middleware/authenticate-socket.d.ts",
+      "default": "./dist/middleware/authenticate-socket.js"
     },
     "./types": {
-      "import": "./dist/types/tokenpayload.js",
-      "types": "./dist/types/tokenpayload.d.ts"
+      "types": "./dist/types/tokenpayload.d.ts",
+      "default": "./dist/types/tokenpayload.js"
     }
   },
   "scripts": {
