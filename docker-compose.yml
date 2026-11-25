@@ -1,33 +1,36 @@
 services:
   auth-service:
+  
     build:
-      context: ./services/auth-service
-      dockerfile: Dockerfile.prod
+      context: .
+      dockerfile: auth-service/Dockerfile
     ports:
       - "3000:3000"
     env_file:
-      - ./services/auth-service/.env
-    environment:
-      NODE_ENV: production
+      - ./auth-service/.env
     secrets:
       - private_key
-      - public_key
+      - public_key  
+    environment:
+      NODE_ENV: production
     restart: unless-stopped
 
   user-service:
     build:
-      context: ./services/user-service
-      dockerfile: Dockerfile.prod
+      context: .
+      dockerfile: User-service/Dockerfile
     ports:
       - "3001:3001"
     env_file:
-      - ./services/user-service/.env
+      - ./User-service/.env
     environment:
       NODE_ENV: production
     restart: unless-stopped
 
+
 secrets:
   private_key:
     file: ./secrets/private_key.pem
+
   public_key:
-    file: ./secrets/public_key.pem
+    file: ./secrets/public_key.pem    

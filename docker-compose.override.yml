@@ -13,6 +13,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+
   postgres:
     image: postgres:15
     container_name: campus-postgres
@@ -29,38 +30,53 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+
+  redis:
+    image: redis:7
+    container_name: campus-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   auth-service:
-    build:
-      dockerfile: Dockerfile            # your dev Dockerfile
     environment:
       NODE_ENV: development
       DATABASE_URL: postgresql://Chaitanya:Chaitanya%40123@postgres:5432/authdb
       RABBITMQ_URL: amqp://guest:guest@rabbit-mq:5672
+      REDIS_URL: redis://redis:6379
     volumes:
-      - ./services/auth-service:/app
-      - /app/node_modules
+      - ./auth-service:/app/auth-service
+      - /app/auth-service/node_modules
     command: sh -c "pnpm prisma generate && pnpm run dev"
     depends_on:
       postgres:
         condition: service_healthy
       rabbit-mq:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+
   user-service:
-    build:
-      dockerfile: Dockerfile
     environment:
       NODE_ENV: development
       DATABASE_URL: postgresql://Chaitanya:Chaitanya%40123@postgres:5432/userdb
       RABBITMQ_URL: amqp://guest:guest@rabbit-mq:5672
+      REDIS_URL: redis://redis:6379
     volumes:
-      - ./services/user-service:/app
-      - /app/node_modules
+      - ./User-service:/app/User-service
+      - /app/User-service/node_modules
     command: sh -c "pnpm prisma generate && pnpm run dev"
     depends_on:
       postgres:
         condition: service_healthy
       rabbit-mq:
         condition: service_healthy
-        
+      # redis:
+      #   condition: service_healthy
+
 volumes:
   postgres_data:
