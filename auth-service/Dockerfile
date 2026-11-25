@@ -21,7 +21,8 @@ RUN pnpm install --frozen-lockfile
 # 3. Service source
 COPY auth-service ./
 ARG DATABASE_URL="postgresql://build:build@localhost:5432/build"
-RUN pnpm prisma generate && pnpm run build
+RUN pnpm prisma generate 
+RUN pnpm run build
 
 EXPOSE 3000
-CMD ["node", "dist/index.js"]
+CMD ["node", "dist/server.js"]

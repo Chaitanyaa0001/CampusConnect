@@ -2,10 +2,10 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
-import authRoutes from "./routes/authWrapper.route";
-import jwksRoutes from "./routes/jwks.route";
-import { env } from "./config/env.config";
-import {globalErrorHandler} from "./error/errorHandler";
+import authRoutes from "./routes/authWrapper.route.js";
+import jwksRoutes from "./routes/jwks.route.js";
+import { env } from "./config/env.config.js";
+import {globalErrorHandler} from "./error/errorHandler.js";
 
 const app = express();
 
