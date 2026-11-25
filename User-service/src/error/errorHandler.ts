@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { AppError } from "./AppError";
+import { AppError } from "./AppError.js";
 import multer from "multer";
 import { CloudinaryError } from "cloudinary-sdk";
 

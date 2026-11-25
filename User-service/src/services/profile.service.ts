@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma.js";
-import { Prisma } from "../../generated/prisma/client";
+import { Prisma } from "../generated/prisma/client.js";
 import { AppError } from "../error/AppError.js";
 import {uploadImage,isSupportedImage,} from "cloudinary-sdk";
 import { cloudinaryClient } from "../config/cloudinary.config.js";
@@ -50,7 +50,7 @@ export const updateProfilePhotoService = async (
   const uploaded = await uploadImage(
     cloudinaryClient,
     file.buffer,
-   env.CLOUDINARY_FOLDER ?? "campusconnect/profiles",
+    env.CLOUDINARY_FOLDER ?? "campusconnect/profiles",
     {
       publicId: userId,
       maxWidth: 512,

@@ -6,7 +6,7 @@ import { catchAsync } from "../error/tryCatchAsync.js";
 import {getMyProfileService,updateProfilePhotoService,} from "../services/profile.service.js";
 
 export const getMyProfileController = catchAsync(
-    async (req: Request, res: Response) => {
+async (req: Request, res: Response) => {
 
         const userId = req.user?.userId;
         if (!userId) {
@@ -16,7 +16,6 @@ export const getMyProfileController = catchAsync(
             );
         }
         const user = await getMyProfileService(userId);
-
         return res.status(200).json({
             success: true,
             data: user,

@@ -1,4 +1,4 @@
-import type { Prisma } from "../../generated/prisma/client";
+import type { Prisma } from "../generated/prisma/client.js";
 import { prisma } from "../lib/prisma.js";
 
 /**
@@ -11,7 +11,7 @@ export const processOnce = async (
   eventId: string,
   work: (tx: Prisma.TransactionClient) => Promise<void>
 ) => {
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const marker = await tx.processedEvent.createMany({
       data: [{ eventId }],
       skipDuplicates: true, // INSERT ... ON CONFLICT DO NOTHING

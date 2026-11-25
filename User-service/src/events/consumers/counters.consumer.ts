@@ -1,8 +1,9 @@
 import { assertConsumerQueue, consumeEvents, ROUTING_KEY } from "events-sdk";
-import type { Prisma } from "../../../generated/prisma/client";
 import { processOnce } from "../../worker/Processonce.js";
 import { QUEUES } from "../queues.js";
 import type { OwnedEvent } from "../../types/events.js";
+// import { prisma } from "../../lib/prisma.js";
+import type { Prisma } from "../../generated/prisma/client.js";
 
 // One consumer definition per counter. Replaces the three copy-pasted consumer files.
 // created -> +1, deleted -> -1 (never below 0).
@@ -49,7 +50,7 @@ export const startCounterConsumers = async () => {
           if (r.count === 0) throw new Error(`Profile ${userId} not created yet`);
         } else {
           const data = { [c.field]: { decrement: 1 } } as Prisma.UserUpdateManyMutationInput;
-          const where = { id: userId, [c.field]: { gt: 0 } } as Prisma.UserWhereInput;
+          const where = { id: userId, [c.field]: { gt: 0 } } as Prisma .UserWhereInput;
           await tx.user.updateMany({ where, data }); // floor at 0
         }
       });
