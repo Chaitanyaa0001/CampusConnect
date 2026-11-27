@@ -1,36 +1,54 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  // inside src/, like carpool and user service, so tsc and Docker pick the generated client up.
+  // utils/prisma.client.ts must import from "../generated/prisma/client.js"
+  output = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
 }
+
 model LostAndFound {
-  id                String          @id @default(cuid())
-  userId            String
+  id          String          @id @default(cuid())
+  userId      String
+  itemName    String
+  type        LostFoundType
+  location    String
+  date        DateTime // when it was lost or found
+  description String?
+  tags        String[]
+  status      LostFoundStatus @default(OPEN)
 
-  itemName          String
-  type              LostFoundType
-  location          String
-  date              DateTime
-  description       String?
+  imagePublicId String? // Cloudinary id: internal, never returned to clients
+  imageUrl      String?
 
-  tags              String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  imagePublicId     String?
-  imageUrl          String?
-
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+  @@index([userId, createdAt]) // GET /me
+  @@index([status, type, createdAt]) // GET / (open items, newest first, optional type filter)
 }
 
 enum LostFoundType {
   LOST
   FOUND
+}
+
+enum LostFoundStatus {
+  OPEN
+  RESOLVED // the owner got the item back (or the finder handed it over)
+}
+
+// Written in the SAME transaction as the item, then published to RabbitMQ by outbox/relay.ts.
+model OutboxEvent {
+  id          String    @id @default(uuid())
+  routingKey  String
+  payload     Json
+  attempts    Int       @default(0)
+  lastError   String?
+  createdAt   DateTime  @default(now())
+  publishedAt DateTime?
+
+  @@index([publishedAt, createdAt])
 }

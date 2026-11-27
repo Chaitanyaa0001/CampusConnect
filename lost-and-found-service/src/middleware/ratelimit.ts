@@ -1,0 +1,19 @@
+import rateLimit from "express-rate-limit";
+
+// Load testing: RATE_LIMIT_DISABLED=true. Refused in production on purpose.
+const disabled = process.env.RATE_LIMIT_DISABLED === "true";
+if (disabled && process.env.NODE_ENV === "production") {
+  throw new Error("RATE_LIMIT_DISABLED must not be set in production");
+}
+
+// Each post can upload an image (Cloudinary quota, server memory).
+//  Must run AFTER authenticate.
+export const createItemLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: Number(process.env.CREATE_ITEM_RATE_LIMIT) || 10,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  keyGenerator: (req) => req.user?.userId ?? "anonymous",
+  message: { success: false, message: "Too many posts, try again later" },
+  skip: () => disabled,
+});

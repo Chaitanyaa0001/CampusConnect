@@ -1,39 +1,18 @@
 import { prisma } from "../utils/prisma.client.js";
+import { itemSelect } from "./itemSelect.js";
+import type { MyItemsQuery } from "../validator/validator.js";
 
+// my posts (profile page tab): every status, newest first, cursor pagination
+export const getMyItemsService = async (userId: string, { limit, cursor }: MyItemsQuery) => {
+  const rows = await prisma.lostAndFound.findMany({
+    where: { userId },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    take: limit + 1,
+    ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+    select: itemSelect,
+  });
 
-export const getLostAndFoundByMeService = async (userId: string,page = 1,limit = 10,) => {
-    const skip =(page - 1) * limit;
-    const [total,lostAndFound,] = await prisma.$transaction([
-        prisma.lostAndFound.count({
-            where: {
-                userId,
-            },
-        }),
-        prisma.lostAndFound.findMany({
-            where: {
-                userId,
-            },
-            skip,
-            take: limit,
-            orderBy: {
-                createdAt: "desc",
-            },
-        }),
-    ]);
-    return {
-        lostAndFound,
-        pagination: {
-            total,
-            page,
-            limit,
-            totalPages:
-                Math.ceil(
-                    total / limit
-                ),
-            hasNext:
-                page * limit < total,
-            hasPrev:
-                page > 1,
-        },
-    };
+  const hasMore = rows.length > limit;
+  const items = hasMore ? rows.slice(0, limit) : rows;
+  return { items, nextCursor: hasMore ? items[items.length - 1].id : null };
 };

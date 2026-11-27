@@ -1,41 +1,47 @@
-import { uploadImage, deleteImage } from "cloudinary-sdk";
-
+import { ROUTING_KEY } from "events-sdk";
 import { prisma } from "../utils/prisma.client.js";
-import { cloudinary } from "../config/cloudinary.config.js";
-import { env } from "../config/env.config.js";
-import type { ICreateLostAndFoundInput } from "../interface/interface.js";
+import { itemSelect } from "./itemSelect.js";
+import { storeImage, removeImage } from "./imagestorage.service.js";
+import type { CreateItemInput } from "../validator/validator.js";
 
-export const postLostAndFoundService = async (data: ICreateLostAndFoundInput,userId: string,file?: Express.Multer.File,) => {
-    let uploadedImage:{public_id: string;secure_url: string;}| undefined;
-    if (file) {
-        uploadedImage = await uploadImage(
-            cloudinary,
-            file.buffer,
-            env.CLOUDINARY_FOLDER_NAME,
-        );
+export const createItemService = async (input: CreateItemInput, userId: string, file?: Express.Multer.File) => {
+  // upload BEFORE the transaction: never hold a database transaction open during a network call
+  const image = file ? await storeImage(file.buffer) : undefined;
+
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const item = await tx.lostAndFound.create({
+        data: {
+          userId,
+          itemName: input.itemName,
+          type: input.type,
+          location: input.location,
+          date: input.date,
+          description: input.description,
+          tags: input.tags,
+          imagePublicId: image?.public_id,
+          imageUrl: image?.secure_url,
+        },
+        select: itemSelect,
+      });
+
+      // same transaction: the item and its event are saved together or not at all
+      await tx.outboxEvent.create({
+        data: {
+          routingKey: ROUTING_KEY.LOST_FOUND_CREATED,
+          payload: { userId, entityId: item.id },
+        },
+      });
+
+      return item;
+    });
+  } catch (error) {
+    // the row was not saved, so the uploaded image would be orphaned: remove it (best effort)
+    if (image) {
+      await removeImage(image.public_id).catch((e) =>
+        console.error("[lost-found] could not remove orphan image", image.public_id, e)
+      );
     }
-    try {
-        const lostAndFound = await prisma.lostAndFound.create({
-            data: {
-                userId,
-                itemName: data.itemName,
-                type: data.type,
-                location: data.location,
-                date: new Date(data.date),
-                description: data.description,
-                tags: data.tags,
-                imagePublicId: uploadedImage?.public_id,
-                imageUrl: uploadedImage?.secure_url,
-            },
-        });
-        return lostAndFound;
-    } catch (error) {
-        if (uploadedImage) {
-            await deleteImage(
-                cloudinary,
-                uploadedImage.public_id,
-            );
-        }
-        throw error;
-    }
+    throw error;
+  }
 };
