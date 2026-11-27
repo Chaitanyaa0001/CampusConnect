@@ -1,6 +1,6 @@
 import { prisma } from "../utils/prisma.client.js";
 import { AppError } from "../error/AppError.js";
-import { itemSelect } from "./itemSelect.js";
+import { itemSelect } from "../types/itemSelect.js";
 
 export const getItemByIdService = async (id: string) => {
   const item = await prisma.lostAndFound.findUnique({ where: { id }, select: itemSelect });

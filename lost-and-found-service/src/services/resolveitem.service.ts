@@ -1,7 +1,7 @@
 import { Prisma } from "../generated/prisma/client";
 import { prisma } from "../utils/prisma.client.js";
 import { AppError } from "../error/AppError.js";
-import { itemSelect } from "./itemSelect.js";
+import { itemSelect } from "../types/itemSelect.js";
 
 // owner only: mark the item as resolved so it leaves the public feed
 export const resolveItemService = async (id: string, userId: string) => {

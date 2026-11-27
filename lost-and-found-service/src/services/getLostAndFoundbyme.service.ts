@@ -1,5 +1,5 @@
 import { prisma } from "../utils/prisma.client.js";
-import { itemSelect } from "./itemSelect.js";
+import { itemSelect } from "../types/itemSelect.js";
 import type { MyItemsQuery } from "../validator/validator.js";
 
 // my posts (profile page tab): every status, newest first, cursor pagination

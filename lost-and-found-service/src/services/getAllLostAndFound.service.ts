@@ -1,6 +1,6 @@
 import type { Prisma } from "../generated/prisma/client";
 import { prisma } from "../utils/prisma.client.js";
-import { itemSelect } from "./itemSelect.js";
+import { itemSelect } from "../types/itemSelect.js";
 import { dayRange } from "./dayRange.js";
 import type { ListItemsQuery } from "../validator/validator.js";
 

@@ -4,7 +4,7 @@ import { env } from "./config/env.config.js";
 // channel created by the SDK's own connectRabbitMQ
 import { connectRabbitMQ, onShutdown } from "events-sdk";
 import { prisma } from "./utils/prisma.client.js";
-import { startOutboxRelay } from "./oubox/relay.js";
+import { startOutboxRelay } from "./outbox/relay.js";
 import { startCleanupJob } from "./jobs/cleanup.js";
 import app from "./app.js";
 

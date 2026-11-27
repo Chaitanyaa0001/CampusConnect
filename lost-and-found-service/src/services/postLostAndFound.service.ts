@@ -1,7 +1,7 @@
 import { ROUTING_KEY } from "events-sdk";
 import { prisma } from "../utils/prisma.client.js";
-import { itemSelect } from "./itemSelect.js";
-import { storeImage, removeImage } from "./imagestorage.service.js";
+import { itemSelect } from "../types/itemSelect.js";
+import { storeImage, removeImage } from "../utils/imagestorage.js";
 import type { CreateItemInput } from "../validator/validator.js";
 
 export const createItemService = async (input: CreateItemInput, userId: string, file?: Express.Multer.File) => {
