@@ -8,6 +8,6 @@
  *
  * 🟢 You can import this file directly.
  */
-export type * from './models/LostAndFound.ts'
-export type * from './models/OutboxEvent.ts'
-export type * from './commonInputTypes.ts'
+export type * from './models/LostAndFound.js'
+export type * from './models/OutboxEvent.js'
+export type * from './commonInputTypes.js'

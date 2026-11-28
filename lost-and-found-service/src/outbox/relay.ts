@@ -1,5 +1,6 @@
 import { publishEvent } from "events-sdk";
 import { prisma } from "../utils/prisma.client.js";
+import { Prisma } from "../generated/prisma/client.js";
 
 const BATCH = 20;
 const MAX_ATTEMPTS = 10;
@@ -10,7 +11,7 @@ type Row = { id: string; routingKey: string; payload: unknown; attempts: number 
 // Returns how many events were published in this round.
 const relayOnce = (): Promise<number> =>
   prisma.$transaction(
-    async (tx) => {
+    async (tx : Prisma.TransactionClient) => {
       // SKIP LOCKED: several replicas can run the relay without picking the same rows
       const rows = await tx.$queryRaw<Row[]>`
         SELECT "id", "routingKey", "payload", "attempts"
@@ -43,6 +44,7 @@ const relayOnce = (): Promise<number> =>
     { timeout: 15000, maxWait: 5000 }
   );
 
+  
 export const startOutboxRelay = () => {
   let stopped = false;
   let timer: NodeJS.Timeout | undefined;

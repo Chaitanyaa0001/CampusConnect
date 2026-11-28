@@ -1,7 +1,7 @@
 import type { Prisma } from "../generated/prisma/client";
 import { prisma } from "../utils/prisma.client.js";
 import { itemSelect } from "../types/itemSelect.js";
-import { dayRange } from "./dayRange.js";
+import { dayRange } from "../utils/dayRange.js";
 import type { ListItemsQuery } from "../validator/validator.js";
 
 // Newest first, so this uses a CURSOR instead of page numbers: with page numbers, every new post

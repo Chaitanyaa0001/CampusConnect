@@ -9,7 +9,7 @@ export const createItemService = async (input: CreateItemInput, userId: string, 
   const image = file ? await storeImage(file.buffer) : undefined;
 
   try {
-    return await prisma.$transaction(async (tx) => {
+    return await prisma.$transaction(async (tx: { lostAndFound: { create: (arg0: { data: { userId: string; itemName: string; type: "LOST" | "FOUND"; location: string; date: Date; description: string | undefined; tags: string[]; imagePublicId: string | undefined; imageUrl: string | undefined; }; select: { id: true; userId: true; itemName: true; type: true; location: true; date: true; description: true; tags: true; imageUrl: true; status: true; createdAt: true; }; }) => any; }; outboxEvent: { create: (arg0: { data: { routingKey: "lost_found.created"; payload: { userId: string; entityId: any; }; }; }) => any; }; }) => {
       const item = await tx.lostAndFound.create({
         data: {
           userId,

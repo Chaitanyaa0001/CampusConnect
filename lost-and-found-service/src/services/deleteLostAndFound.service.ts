@@ -9,7 +9,7 @@ export const deleteItemService = async (id: string, userId: string) => {
   let imagePublicId: string | null;
 
   try {
-    imagePublicId = await prisma.$transaction(async (tx : Prisma.TransactionClient) => {
+      imagePublicId = await prisma.$transaction(async (tx : Prisma.TransactionClient) => {
       // delete returns the removed row, so we learn the image id in the same statement
       const removed = await tx.lostAndFound.delete({
         where: { id, userId }, // ownership is part of the WHERE

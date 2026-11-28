@@ -3,7 +3,7 @@ import { requireUser } from "auth-sdk";
 import { catchAsync } from "../error/tryCatchAsync.js";
 import { getValid } from "../validator/validator.js";
 import type { IdParam } from "../validator/validator.js";
-import { resolveItemService } from "../services/resolveItem.service.js";
+import { resolveItemService } from "../services/resolveitem.service.js";
 
 export const resolveItemController = catchAsync(async (req: Request, res: Response) => {
   const { userId } = requireUser(req);
